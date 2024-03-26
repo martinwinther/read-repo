@@ -1,0 +1,118 @@
+{
+  "books": [
+    {
+      "id": "1",
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "isbn": "9780743273565",
+      "genre": "Classic",
+      "language": "English",
+      "audience": "Adults",
+      "location": "Living room shelf",
+      "purchaseDate": "2021-07-22",
+      "purchaseLocation": "Barnes & Noble",
+      "price": "$15",
+      "publisher": {
+        "name": "Scribner",
+        "address": "123 Publisher Lane, New York, NY",
+        "contactEmail": "info@scribner.com",
+        "contactPhone": "555-0101"
+      }
+    },
+    {
+      "id": "2",
+      "title": "Harry Potter and the Sorcerer's Stone",
+      "author": "J.K. Rowling",
+      "isbn": "9780590353427",
+      "genre": "Fantasy",
+      "language": "English",
+      "audience": "Children",
+      "location": "Kids' room",
+      "purchaseDate": "2020-11-15",
+      "purchaseLocation": "Amazon",
+      "price": "$22",
+      "publisher": {
+        "name": "Bloomsbury",
+        "address": "50 Bedford Square, London, WC1B 3DP",
+        "contactEmail": "info@bloomsbury.com",
+        "contactPhone": "555-0202"
+      }
+    },
+    {
+      "id": "3",
+      "title": "1984",
+      "author": "George Orwell",
+      "isbn": "9780451524935",
+      "genre": "Dystopian",
+      "language": "English",
+      "audience": "Adults",
+      "location": "Bedroom bookcase",
+      "purchaseDate": "2019-05-10",
+      "purchaseLocation": "Local Bookstore",
+      "price": "$18",
+      "publisher": {
+        "name": "Secker & Warburg",
+        "address": "20 Vauxhall Bridge Rd, London",
+        "contactEmail": "info@warburg.com",
+        "contactPhone": "555-0303"
+      }
+    },
+    {
+      "id": "4",
+      "title": "The Catcher in the Rye",
+      "author": "J.D. Salinger",
+      "isbn": "9780316769488",
+      "genre": "Literary Fiction",
+      "language": "English",
+      "audience": "Adults",
+      "location": "Study room",
+      "purchaseDate": "2022-03-14",
+      "purchaseLocation": "Ebay",
+      "price": "$20",
+      "publisher": {
+        "name": "Little, Brown and Company",
+        "address": "1290 Avenue of the Americas, New York, NY",
+        "contactEmail": "info@littlebrown.com",
+        "contactPhone": "555-0404"
+      }
+    },
+    {
+      "id": "5",
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "isbn": "9780061120084",
+      "genre": "Classic",
+      "language": "English",
+      "audience": "Adults",
+      "location": "Office shelf",
+      "purchaseDate": "2018-09-10",
+      "purchaseLocation": "Thrift Store",
+      "price": "$10",
+      "publisher": {
+        "name": "J. B. Lippincott & Co.",
+        "address": "East Washington Square, Philadelphia, PA",
+        "contactEmail": "info@lippincott.com",
+        "contactPhone": "555-0505"
+      }
+    },
+    {
+      "id": "6",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "isbn": "9781503290563",
+      "genre": "Classic",
+      "language": "English",
+      "audience": "Adults",
+      "location": "Guest room shelf",
+      "purchaseDate": "2023-01-05",
+      "purchaseLocation": "Books-A-Million",
+      "price": "$12",
+      "publisher": {
+        "name": "T. Egerton, Whitehall",
+        "address": "Historical Publisher St, London",
+        "contactEmail": "classic@egerton.com",
+        "contactPhone": "555-0606"
+      }
+    }
+  ]
+}
