@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { FaPen } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
+
 const Book = ({ book }) => {
   const [showFullDescription, setShowFullDescription] = useState(false)
 
@@ -34,11 +36,11 @@ const Book = ({ book }) => {
             <FaPen className="inline text-lg mb-1 mr-1"></FaPen>
             {book.author}
           </div>
-          <a
-            href={`/book/${book.id}`}
+          <Link
+            to={`/book/${book.id}`}
             className="h-[36px] bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-center text-sm">
             Read More
-          </a>
+          </Link>
         </div>
       </div>
     </div>
