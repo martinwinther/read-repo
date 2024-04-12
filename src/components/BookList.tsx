@@ -8,8 +8,11 @@ const BookList = ({ isHome = false }) => {
 
   useEffect(() => {
     const fetchBooks = async () => {
+      const apiUrl = isHome
+        ? 'http://localhost:3000/books?_limit=3'
+        : 'http://localhost:3000/books'
       try {
-        const res = await fetch('http://localhost:3000/books')
+        const res = await fetch(apiUrl)
         const data = await res.json()
         setBooks(data)
       } catch (error) {
