@@ -8,14 +8,14 @@ import MainLayout from './layouts/MainLayout'
 import HomePage from './pages/HomePage'
 import BooksPage from './pages/BooksPage'
 import NotFoundPage from './pages/NotFoundPage'
-import BookPage from './components/BookPage'
+import BookPage, { bookLoader } from './components/BookPage'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<MainLayout />}>
       <Route index element={<HomePage />} />
       <Route path="/books" element={<BooksPage />} />
-      <Route path="/books/:id" element={<BookPage />} />
+      <Route path="/books/:id" element={<BookPage />} loader={bookLoader} />
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   )

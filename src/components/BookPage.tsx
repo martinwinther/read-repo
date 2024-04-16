@@ -1,7 +1,16 @@
-import React from 'react'
+import { useParams, useLoaderData } from 'react-router-dom'
 
 const BookPage = () => {
-  return <div>BookPage</div>
+  const { id } = useParams()
+  const book = useLoaderData()
+
+  return <h1>{book.title}</h1>
 }
 
-export default BookPage
+const bookLoader = async ({ params }) => {
+  const res = await fetch(`/api/books/${params.id}`)
+  const data = await res.json()
+  return data
+}
+
+export { BookPage as default, bookLoader }
