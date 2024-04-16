@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const AddBookPage = () => {
+const AddBookPage = ({ addBookSubmit }) => {
   const [title, setTitle] = useState('')
   const [language, setLanguage] = useState('English')
   const [genre, setGenre] = useState('Fantasy')
@@ -30,6 +30,8 @@ const AddBookPage = () => {
         long: longDescription,
       },
     }
+    addBookSubmit(newBook)
+    return navigate('/books')
   }
 
   return (
