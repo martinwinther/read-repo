@@ -12,6 +12,7 @@ import BookPage, { bookLoader } from './components/BookPage'
 import AddBookPage from './pages/AddBookPage'
 
 const App = () => {
+  // Add new book
   const addBook = async (newBook) => {
     const res = await fetch('/api/books', {
       method: 'POST',
@@ -19,6 +20,14 @@ const App = () => {
         'Content-Type': 'aaplication/json',
       },
       body: JSON.stringify(newBook),
+    })
+    return
+  }
+
+  // Delete book
+  const deleteBook = async (bookId) => {
+    const res = await fetch(`/api/books/${bookId}`, {
+      method: 'DELETE',
     })
     return
   }
@@ -32,7 +41,11 @@ const App = () => {
           path="/add-book"
           element={<AddBookPage addBookSubmit={addBook} />}
         />
-        <Route path="/books/:id" element={<BookPage />} loader={bookLoader} />
+        <Route
+          path="/books/:id"
+          element={<BookPage deleteBook={deleteBook} />}
+          loader={bookLoader}
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     )

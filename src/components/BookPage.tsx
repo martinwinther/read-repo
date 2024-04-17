@@ -1,10 +1,20 @@
-import { useParams, useLoaderData } from 'react-router-dom'
+import { useParams, useLoaderData, useNavigate } from 'react-router-dom'
 import { FaArrowLeft, FaPen } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 
-const BookPage = () => {
+const BookPage = ({ deleteBook }) => {
+  const navigate = useNavigate()
   const { id } = useParams()
   const book = useLoaderData()
+
+  const onDeleteClick = (bookId) => {
+    const confirm = window.confirm('Are you sure you want to delete this book?')
+
+    if (!confirm) return
+
+    deleteBook(bookId)
+    navigate('/books')
+  }
 
   return (
     <>
@@ -79,7 +89,9 @@ const BookPage = () => {
                   className="bg-indigo-500 hover:bg-indigo-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
                   Edit Book
                 </Link>
-                <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
+                <button
+                  onClick={() => onDeleteClick(book.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block">
                   Delete Book
                 </button>
               </div>
