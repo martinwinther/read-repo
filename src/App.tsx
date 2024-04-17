@@ -10,6 +10,7 @@ import BooksPage from './pages/BooksPage'
 import NotFoundPage from './pages/NotFoundPage'
 import BookPage, { bookLoader } from './components/BookPage'
 import AddBookPage from './pages/AddBookPage'
+import EditBookPage from './pages/EditBookPage'
 
 const App = () => {
   // Add new book
@@ -32,6 +33,18 @@ const App = () => {
     return
   }
 
+  //Update book
+  const updateBook = async (updatedBook) => {
+    const res = await fetch(`/api/books${updatedBook.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'aaplication/json',
+      },
+      body: JSON.stringify(updatedBook),
+    })
+    return
+  }
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<MainLayout />}>
@@ -40,6 +53,11 @@ const App = () => {
         <Route
           path="/add-book"
           element={<AddBookPage addBookSubmit={addBook} />}
+        />
+        <Route
+          path="/edit-book/:id"
+          element={<EditBookPage updateBookSubmit={updateBook} />}
+          loader={bookLoader}
         />
         <Route
           path="/books/:id"
