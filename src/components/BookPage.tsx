@@ -1,6 +1,7 @@
 import { useParams, useLoaderData, useNavigate } from 'react-router-dom'
 import { FaArrowLeft, FaPen } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const BookPage = ({ deleteBook }) => {
   const navigate = useNavigate()
@@ -13,6 +14,7 @@ const BookPage = ({ deleteBook }) => {
     if (!confirm) return
 
     deleteBook(bookId)
+    toast.success('Book delected succesfully')
     navigate('/books')
   }
 

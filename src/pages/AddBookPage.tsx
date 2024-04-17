@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const AddBookPage = ({ addBookSubmit }) => {
   const [title, setTitle] = useState('')
@@ -31,6 +32,7 @@ const AddBookPage = ({ addBookSubmit }) => {
       },
     }
     addBookSubmit(newBook)
+    toast.success('Succesfully added the book')
     return navigate('/books')
   }
 
