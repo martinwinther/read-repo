@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { fetchBooks, Book } from '@/lib/utils'
 import {
 	Dialog,
-	DialogTrigger,
 	DialogContent,
 	DialogHeader,
 	DialogFooter,
@@ -21,6 +20,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import { toast, Toaster } from 'sonner'
 
 export default function Home() {
 	const [query, setQuery] = useState<string>('')
@@ -52,17 +52,24 @@ export default function Home() {
 	}
 
 	const handleConfirm = () => {
-		if (newLocation) {
-			setLocations([...locations, newLocation])
+		const location = newLocation || selectedLocation
+		if (location) {
+			if (newLocation) {
+				setLocations([...locations, newLocation])
+			}
+			toast.success(`Book added to ${location}`)
+			setOpenDialog(false)
+			setSelectedBook(null)
+			setNewLocation('')
+			setSelectedLocation('')
+		} else {
+			toast.error('Please select or add a location')
 		}
-		setOpenDialog(false)
-		setSelectedBook(null)
-		setNewLocation('')
-		setSelectedLocation('')
 	}
 
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
+			<Toaster position="bottom-right" />
 			<div>
 				<Image
 					className="py-8"
