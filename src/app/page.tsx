@@ -5,10 +5,35 @@ import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { fetchBooks, Book } from '@/lib/utils'
+import {
+	Dialog,
+	DialogTrigger,
+	DialogContent,
+	DialogHeader,
+	DialogFooter,
+	DialogTitle,
+	DialogDescription,
+} from '@/components/ui/dialog'
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
 
 export default function Home() {
 	const [query, setQuery] = useState<string>('')
 	const [books, setBooks] = useState<Book[]>([])
+	const [openDialog, setOpenDialog] = useState<boolean>(false)
+	const [selectedBook, setSelectedBook] = useState<Book | null>(null)
+	const [locations, setLocations] = useState<string[]>([
+		'Living Room',
+		'Bedroom',
+		'Office',
+	])
+	const [newLocation, setNewLocation] = useState<string>('')
+	const [selectedLocation, setSelectedLocation] = useState<string>('')
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value)
@@ -19,6 +44,21 @@ export default function Home() {
 			const result = await fetchBooks(query)
 			setBooks(result)
 		}
+	}
+
+	const handleAddClick = (book: Book) => {
+		setSelectedBook(book)
+		setOpenDialog(true)
+	}
+
+	const handleConfirm = () => {
+		if (newLocation) {
+			setLocations([...locations, newLocation])
+		}
+		setOpenDialog(false)
+		setSelectedBook(null)
+		setNewLocation('')
+		setSelectedLocation('')
 	}
 
 	return (
@@ -56,7 +96,11 @@ export default function Home() {
 												{book.volumeInfo.publishedDate}
 											</p>
 										</div>
-										<Button className="ml-4">Add</Button>
+										<Button
+											className="ml-4"
+											onClick={() => handleAddClick(book)}>
+											Add
+										</Button>
 									</div>
 								</li>
 							))}
@@ -66,6 +110,55 @@ export default function Home() {
 					)}
 				</div>
 			</div>
+
+			<Dialog open={openDialog} onOpenChange={setOpenDialog}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Add Book to a Location</DialogTitle>
+						<DialogDescription>
+							Select a location for this book or add a new one.
+						</DialogDescription>
+					</DialogHeader>
+					{selectedBook && (
+						<div className="mt-4">
+							<h3 className="text-xl font-bold">
+								{selectedBook.volumeInfo.title}
+							</h3>
+							<p className="text-gray-700">
+								{selectedBook.volumeInfo.authors?.join(', ')}
+							</p>
+							<p className="text-gray-500">
+								{selectedBook.volumeInfo.publishedDate}
+							</p>
+						</div>
+					)}
+					<div className="mt-4">
+						<Select onValueChange={setSelectedLocation}>
+							<SelectTrigger className="w-full">
+								<SelectValue placeholder="Select a location" />
+							</SelectTrigger>
+							<SelectContent>
+								{locations.map((location, index) => (
+									<SelectItem key={index} value={location}>
+										{location}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<Input
+							type="text"
+							placeholder="Add a new location"
+							value={newLocation}
+							onChange={(e) => setNewLocation(e.target.value)}
+							className="mt-4"
+						/>
+					</div>
+					<DialogFooter>
+						<Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+						<Button onClick={handleConfirm}>Confirm</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</main>
 	)
 }
