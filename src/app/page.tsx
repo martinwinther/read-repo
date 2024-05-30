@@ -22,6 +22,10 @@ import {
 } from '@/components/ui/select'
 import { toast, Toaster } from 'sonner'
 
+interface BookWithLocation extends Book {
+	location: string
+}
+
 export default function Home() {
 	const [query, setQuery] = useState<string>('')
 	const [books, setBooks] = useState<Book[]>([])
@@ -34,6 +38,7 @@ export default function Home() {
 	])
 	const [newLocation, setNewLocation] = useState<string>('')
 	const [selectedLocation, setSelectedLocation] = useState<string>('')
+	const [bookList, setBookList] = useState<BookWithLocation[]>([])
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value)
@@ -53,7 +58,9 @@ export default function Home() {
 
 	const handleConfirm = () => {
 		const location = newLocation || selectedLocation
-		if (location) {
+		if (location && selectedBook) {
+			const newBook = { ...selectedBook, location }
+			setBookList([...bookList, newBook])
 			if (newLocation) {
 				setLocations([...locations, newLocation])
 			}
@@ -166,6 +173,27 @@ export default function Home() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			{/* Display the list of added books */}
+			<div className="mt-8">
+				<h2 className="text-2xl font-bold">Books Added to Locations</h2>
+				{bookList.length > 0 ? (
+					<ul>
+						{bookList.map((book, index) => (
+							<li key={index} className="mb-4">
+								<h3 className="text-xl font-bold">{book.volumeInfo.title}</h3>
+								<p className="text-gray-700">
+									{book.volumeInfo.authors?.join(', ')}
+								</p>
+								<p className="text-gray-500">{book.volumeInfo.publishedDate}</p>
+								<p className="text-gray-500">Location: {book.location}</p>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p>No books added yet</p>
+				)}
+			</div>
 		</main>
 	)
 }
