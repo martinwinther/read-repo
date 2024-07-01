@@ -21,6 +21,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { toast, Toaster } from 'sonner'
+import TopNav from '@/components/TopNav'
 
 interface BookWithLocation extends Book {
 	location: string
