@@ -95,6 +95,35 @@ export default function AddBook() {
 				<Button onClick={handleSearch} className="mt-4">
 					Search
 				</Button>
+
+				<div className="mt-4">
+					{books.length > 0 ? (
+						<ul>
+							{books.map((book) => (
+								<li key={book.id} className="mb-4">
+									<h3 className="text-xl font-bold">{book.volumeInfo.title}</h3>
+									<div className="flex items-center justify-between">
+										<div>
+											<p className="text-gray-700">
+												{book.volumeInfo.authors?.join(', ')}
+											</p>
+											<p className="text-gray-500">
+												{book.volumeInfo.publishedDate}
+											</p>
+										</div>
+										<Button
+											className="ml-4"
+											onClick={() => handleAddClick(book)}>
+											Add
+										</Button>
+									</div>
+								</li>
+							))}
+						</ul>
+					) : (
+						''
+					)}
+				</div>
 			</div>
 
 			<Dialog open={openDialog} onOpenChange={setOpenDialog}>

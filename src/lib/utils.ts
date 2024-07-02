@@ -25,5 +25,6 @@ export async function fetchBooks(query: string): Promise<Book[]> {
 		`https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}`
 	)
 	const data = await res.json()
+	console.log(data)
 	return data.items || []
 }
