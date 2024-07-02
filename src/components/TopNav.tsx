@@ -6,7 +6,10 @@ import { Button } from './ui/button'
 export default function TopNav() {
 	return (
 		<nav className="bg-gray-800 p-4 w-full flex justify-between items-center">
-			<div className="text-white text-xl">ReadRepo</div>
+			<Link href="/">
+				<div className="text-white text-xl">ReadRepo</div>
+			</Link>
+
 			<div className="flex space-x-4">
 				<Link href="/add">
 					<Button variant={'outline'}>Add Book</Button>
