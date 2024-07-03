@@ -76,8 +76,8 @@ export default function AddBook() {
 
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
-			<Toaster position="bottom-right" />
 			<div>
+				<Toaster position="bottom-right" />
 				<Image
 					className="py-8"
 					src="/heroImage.png"
