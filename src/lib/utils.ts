@@ -13,6 +13,7 @@ export function cn(...inputs: ClassValue[]) {
 export interface Book {
 	id: string
 	volumeInfo: {
+		imageLinks: any
 		title: string
 		authors?: string[]
 		publishedDate?: string

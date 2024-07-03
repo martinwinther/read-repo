@@ -100,10 +100,19 @@ export default function AddBook() {
 					{books.length > 0 ? (
 						<ul>
 							{books.map((book) => (
-								<li key={book.id} className="mb-4">
-									<h3 className="text-xl font-bold">{book.volumeInfo.title}</h3>
-									<div className="flex items-center justify-between">
-										<div>
+								<li key={book.id} className="mb-4 flex items-start space-x-4">
+									<Image
+										src={book.volumeInfo.imageLinks.smallThumbnail}
+										alt={book.volumeInfo.title}
+										width={60}
+										height={90}
+										className="rounded-lg"
+									/>
+									<div className="flex-1">
+										<h3 className="text-xl font-bold">
+											{book.volumeInfo.title}
+										</h3>
+										<div className="flex flex-col">
 											<p className="text-gray-700">
 												{book.volumeInfo.authors?.join(', ')}
 											</p>
@@ -112,7 +121,7 @@ export default function AddBook() {
 											</p>
 										</div>
 										<Button
-											className="ml-4"
+											className="mt-4"
 											onClick={() => handleAddClick(book)}>
 											Add
 										</Button>
@@ -125,7 +134,6 @@ export default function AddBook() {
 					)}
 				</div>
 			</div>
-
 			<Dialog open={openDialog} onOpenChange={setOpenDialog}>
 				<DialogContent>
 					<DialogHeader>
