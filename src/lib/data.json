@@ -1,0 +1,122 @@
+[
+	{
+		"id": 1,
+		"title": "The Great Escape",
+		"isbn": "978-3-16-148410-0",
+		"author": "John Doe",
+		"published_date": "2021-06-15",
+		"purchased_date": "2021-07-01",
+		"purchase_location": "Online Store",
+		"read": true,
+		"reader": "Alice Johnson",
+		"location": "Living Room Shelf"
+	},
+	{
+		"id": 2,
+		"title": "Deep Dive into JavaScript",
+		"isbn": "978-3-16-148410-1",
+		"author": "Jane Smith",
+		"published_date": "2020-05-21",
+		"purchased_date": "2020-06-11",
+		"purchase_location": "Local Bookstore",
+		"read": false,
+		"reader": "Bob White",
+		"location": "Study Room"
+	},
+	{
+		"id": 3,
+		"title": "Mysteries of the Universe",
+		"isbn": "978-3-16-148410-2",
+		"author": "Karen Blixen",
+		"published_date": "2019-08-30",
+		"purchased_date": "2019-09-15",
+		"purchase_location": "Airport Shop",
+		"read": true,
+		"reader": "Clara Oswald",
+		"location": "Bedroom"
+	},
+	{
+		"id": 4,
+		"title": "History of the 20th Century",
+		"isbn": "978-3-16-148410-3",
+		"author": "Michael Johnson",
+		"published_date": "2018-03-14",
+		"purchased_date": "2018-04-20",
+		"purchase_location": "Online Store",
+		"read": true,
+		"reader": "Dave Tenant",
+		"location": "Office"
+	},
+	{
+		"id": 5,
+		"title": "Philosophy: An Introduction",
+		"isbn": "978-3-16-148410-4",
+		"author": "Sarah Wilson",
+		"published_date": "2022-01-22",
+		"purchased_date": "2022-02-25",
+		"purchase_location": "University Bookstore",
+		"read": false,
+		"reader": "John Snow",
+		"location": "Library"
+	},
+	{
+		"id": 6,
+		"title": "The World of Programming",
+		"isbn": "978-3-16-148410-5",
+		"author": "Catherine Howard",
+		"published_date": "2021-04-17",
+		"purchased_date": "2021-05-19",
+		"purchase_location": "Online Store",
+		"read": true,
+		"reader": "Ned Stark",
+		"location": "Office Desk"
+	},
+	{
+		"id": 7,
+		"title": "Cooking 101",
+		"isbn": "978-3-16-148410-6",
+		"author": "Julia Child",
+		"published_date": "2020-10-10",
+		"purchased_date": "2020-11-15",
+		"purchase_location": "Local Market",
+		"read": true,
+		"reader": "Jamie Oliver",
+		"location": "Kitchen Shelf"
+	},
+	{
+		"id": 8,
+		"title": "Adventures in Fiction",
+		"isbn": "978-3-16-148410-7",
+		"author": "Arthur Conan Doyle",
+		"published_date": "2023-02-12",
+		"purchased_date": "2023-03-18",
+		"purchase_location": "Book Fair",
+		"read": false,
+		"reader": "Sherlock Holmes",
+		"location": "Hallway"
+	},
+	{
+		"id": 9,
+		"title": "Quantum Mechanics Simplified",
+		"isbn": "978-3-16-148410-8",
+		"author": "Richard Feynman",
+		"published_date": "2021-12-31",
+		"purchased_date": "2022-01-07",
+		"purchase_location": "Science Store",
+		"read": true,
+		"reader": "Albert Einstein",
+		"location": "Study Desk"
+	},
+	{
+		"id": 10,
+		"title": "Romantic Poetry",
+		"isbn": "978-3-16-148410-9",
+		"author": "William Wordsworth",
+		"published_date": "2018-07-23",
+		"purchased_date": "2018-08-30",
+		"purchase_location": "Old Bookshop",
+		"read": false,
+		"reader": "Jane Austen",
+		"location": "Living Room Corner"
+	}
+]

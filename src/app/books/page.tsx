@@ -1,40 +1,41 @@
 'use client'
-import { Button } from '@/components/ui/button'
-import { Book } from '@/lib/utils'
-import { useState } from 'react'
+
+// Assuming data.json is in the public folder or correctly placed to be imported directly
+import data from '@/lib/data.json'
+import { useEffect, useState } from 'react'
+import { DataTable } from './data-table'
+import { columns } from './columns'
+
+// Ensure your Book type matches the structure of your JSON data
+interface Book {
+	id: number
+	title: string
+	isbn: string
+	author: string
+	published_date: string
+	purchased_date?: string
+	purchase_location?: string
+	read: boolean
+	reader?: string
+	location?: string
+}
 
 export default function Books() {
 	const [books, setBooks] = useState<Book[]>([])
-	function handleAddClick(book: Book): void {
-		throw new Error('Function not implemented.')
-	}
+
+	useEffect(() => {
+		const loadData = async () => {
+			// Simulate an async operation, e.g., fetching data from an API
+			await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate network delay
+			setBooks(data)
+		}
+
+		loadData()
+	}, [])
 
 	return (
-		<div className="mt-8">
-			{books.length > 0 ? (
-				<ul>
-					{books.map((book) => (
-						<li key={book.id} className="mb-4">
-							<h3 className="text-xl font-bold">{book.volumeInfo.title}</h3>
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="text-gray-700">
-										{book.volumeInfo.authors?.join(', ')}
-									</p>
-									<p className="text-gray-500">
-										{book.volumeInfo.publishedDate}
-									</p>
-								</div>
-								<Button className="ml-4" onClick={() => handleAddClick(book)}>
-									Add
-								</Button>
-							</div>
-						</li>
-					))}
-				</ul>
-			) : (
-				<p>No books found</p>
-			)}
+		<div className="container mx-auto py-10">
+			<DataTable columns={columns} data={data} />
 		</div>
 	)
 }
