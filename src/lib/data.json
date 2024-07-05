@@ -17,10 +17,10 @@
 		"isbn": "978-3-16-148410-1",
 		"author": "Jane Smith",
 		"published_date": "2020-05-21",
-		"purchased_date": "2020-06-11",
+
 		"purchase_location": "Local Bookstore",
 		"read": false,
-		"reader": "Bob White",
+
 		"location": "Study Room"
 	},
 	{
@@ -32,9 +32,9 @@
 		"purchased_date": "2019-09-15",
 		"purchase_location": "Airport Shop",
 		"read": true,
-		"reader": "Clara Oswald",
-		"location": "Bedroom"
+		"reader": "Clara Oswald"
 	},
+
 	{
 		"id": 4,
 		"title": "History of the 20th Century",
