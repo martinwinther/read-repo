@@ -118,5 +118,125 @@
 		"read": false,
 		"reader": "Jane Austen",
 		"location": "Living Room Corner"
+	},
+	{
+		"id": 11,
+		"title": "The Art of War",
+		"isbn": "978-3-16-148411-0",
+		"author": "Sun Tzu",
+		"published_date": "2021-11-11",
+		"purchased_date": "2021-12-01",
+		"purchase_location": "Online Store",
+		"read": true,
+		"reader": "Alex Regal",
+		"location": "Office Desk"
+	},
+	{
+		"id": 12,
+		"title": "The Catcher in the Rye",
+		"isbn": "978-3-16-148412-7",
+		"author": "J.D. Salinger",
+		"published_date": "2019-10-05",
+		"purchased_date": "2019-11-15",
+		"purchase_location": "Local Bookstore",
+		"read": false,
+		"reader": "Casey Smith",
+		"location": "Study Room"
+	},
+	{
+		"id": 13,
+		"title": "1984",
+		"isbn": "978-3-16-148413-4",
+		"author": "George Orwell",
+		"published_date": "2022-01-01",
+		"purchased_date": "2022-01-20",
+		"purchase_location": "Library Sale",
+		"read": true,
+		"reader": "Jordan Miles",
+		"location": "Bedroom Shelf"
+	},
+	{
+		"id": 14,
+		"title": "Brave New World",
+		"isbn": "978-3-16-148414-1",
+		"author": "Aldous Huxley",
+		"published_date": "2018-08-25",
+
+		"purchase_location": "Book Fair",
+		"read": false,
+
+		"location": "Living Room Corner"
+	},
+	{
+		"id": 15,
+		"title": "To Kill a Mockingbird",
+		"isbn": "978-3-16-148415-8",
+		"author": "Harper Lee",
+		"published_date": "2020-12-17",
+		"purchased_date": "2021-01-05",
+		"purchase_location": "School Bookstore",
+		"read": true,
+		"reader": "Erin Grouse",
+		"location": "Office"
+	},
+	{
+		"id": 16,
+		"title": "The Great Gatsby",
+		"isbn": "978-3-16-148416-5",
+		"author": "F. Scott Fitzgerald",
+		"published_date": "2023-03-14",
+		"purchased_date": "2023-04-01",
+		"purchase_location": "Airport Shop",
+		"read": true,
+		"reader": "Sam Winchester",
+		"location": "Office Desk"
+	},
+	{
+		"id": 17,
+		"title": "Pride and Prejudice",
+		"isbn": "978-3-16-148417-2",
+		"author": "Jane Austen",
+		"published_date": "2021-05-21",
+		"purchased_date": "2021-06-10",
+		"purchase_location": "Online Store",
+		"read": false,
+		"reader": "Liz Bennet",
+		"location": "Library"
+	},
+	{
+		"id": 18,
+		"title": "Catch-22",
+		"isbn": "978-3-16-148418-9",
+		"author": "Joseph Heller",
+		"published_date": "2022-07-15",
+		"purchased_date": "2022-08-05",
+		"purchase_location": "Used Bookstore",
+		"read": true,
+		"reader": "John Yossarian",
+		"location": "Study Desk"
+	},
+	{
+		"id": 19,
+		"title": "Crime and Punishment",
+		"isbn": "978-3-16-148419-6",
+		"author": "Fyodor Dostoevsky",
+		"published_date": "2019-04-22",
+		"purchased_date": "2019-05-10",
+		"purchase_location": "Online Store",
+		"read": true,
+		"reader": "Rodya Raskolnikov",
+		"location": "Living Room"
+	},
+	{
+		"id": 20,
+		"title": "Wuthering Heights",
+		"isbn": "978-3-16-148420-2",
+		"author": "Emily Bronte",
+		"published_date": "2018-11-29",
+
+		"purchase_location": "Gift",
+		"read": false,
+
+		"location": "Bedroom Corner"
 	}
 ]

@@ -102,7 +102,10 @@ export default function AddBook() {
 							{books.map((book) => (
 								<li key={book.id} className="mb-4 flex items-start space-x-4">
 									<Image
-										src={book.volumeInfo.imageLinks.smallThumbnail}
+										src={
+											book.volumeInfo.imageLinks.smallThumbnail ||
+											'/placeholder.png'
+										}
 										alt={book.volumeInfo.title}
 										width={60}
 										height={90}
