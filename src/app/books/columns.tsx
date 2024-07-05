@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal } from 'lucide-react'
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,85 +26,127 @@ interface Book {
 
 export const columns: ColumnDef<Book>[] = [
 	{
-		accessorKey: 'id',
-		header: 'ID',
-		cell: (info) => (
-			<div className="text-center">{info.getValue() as number}</div>
-		),
-	},
-	{
 		accessorKey: 'title',
-		header: 'Title',
-		cell: (info) => (
-			<div className="font-medium">{info.getValue() as string}</div>
-		),
-	},
-	{
-		accessorKey: 'isbn',
-		header: 'ISBN',
-		cell: (info) => (
-			<div className="text-center">{info.getValue() as string}</div>
-		),
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Title
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
 	},
 	{
 		accessorKey: 'author',
-		header: 'Author',
-		cell: (info) => <div>{info.getValue() as string}</div>,
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Author
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
+	},
+	{
+		accessorKey: 'isbn',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					ISBN
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
 	},
 	{
 		accessorKey: 'published_date',
-		header: 'Published Date',
-		cell: ({ getValue }) => {
-			const dateStr = getValue() as string
-			const date = new Date(dateStr)
-			const formatted = date.toISOString().split('T')[0] // Formats date as "YYYY-MM-DD"
-			return <div className="text-center">{formatted}</div>
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Published
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
 		},
 	},
 	{
 		accessorKey: 'purchased_date',
-		header: 'Purchased Date',
-		cell: ({ getValue }) => {
-			const dateStr = getValue() as string | undefined
-			const formatted = dateStr
-				? new Date(dateStr).toISOString().split('T')[0]
-				: 'N/A' // Formats date as "YYYY-MM-DD"
-			return <div className="text-center">{formatted}</div>
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Purchased
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
 		},
 	},
 	{
 		accessorKey: 'purchase_location',
-		header: 'Purchase Location',
-		cell: (info) => <div>{(info.getValue() as string) || 'Unspecified'}</div>,
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Purchased at
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
 	},
 	{
 		accessorKey: 'read',
-		header: 'Read',
-		cell: (info) => (
-			<div className="text-center">
-				{(info.getValue() as boolean) ? (
-					<span className="text-green-500">Yes</span>
-				) : (
-					<span className="text-red-500">No</span>
-				)}
-			</div>
-		),
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Read
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
 	},
 	{
 		accessorKey: 'reader',
-		header: 'Reader',
-		cell: (info) => <div>{(info.getValue() as string) || 'Unknown'}</div>,
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Reader
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
 	},
 	{
 		accessorKey: 'location',
-		header: 'Location',
-		cell: (info) => <div>{(info.getValue() as string) || 'Unspecified'}</div>,
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Location
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
 	},
 	{
 		id: 'actions',
+		header: 'Actions',
 		cell: ({ row }) => {
 			const book = row.original
-
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -122,7 +164,7 @@ export const columns: ColumnDef<Book>[] = [
 						<DropdownMenuSeparator />
 						<DropdownMenuItem>Edit book</DropdownMenuItem>
 						<DropdownMenuItem>Delete book</DropdownMenuItem>
-						<DropdownMenuItem>View on google books</DropdownMenuItem>
+						<DropdownMenuItem>View on Google Books</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)

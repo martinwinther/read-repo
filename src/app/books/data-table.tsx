@@ -1,13 +1,15 @@
 'use client'
 
+import * as React from 'react'
 import {
 	ColumnDef,
+	SortingState,
 	flexRender,
 	getCoreRowModel,
-	useReactTable,
 	getPaginationRowModel,
+	getSortedRowModel,
+	useReactTable,
 } from '@tanstack/react-table'
-
 import {
 	Table,
 	TableBody,
@@ -27,23 +29,29 @@ export function DataTable<TData, TValue>({
 	columns,
 	data,
 }: DataTableProps<TData, TValue>) {
+	const [sorting, setSorting] = React.useState<SortingState>([])
 	const table = useReactTable({
 		data,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
+		onSortingChange: setSorting,
+		getSortedRowModel: getSortedRowModel(),
+		state: {
+			sorting,
+		},
 	})
 
 	return (
 		<div>
 			<div className="rounded-md border">
 				<Table>
-					<TableHeader>
+					<TableHeader className="">
 						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id}>
+							<TableRow key={headerGroup.id} className="text-center bg-gray-50">
 								{headerGroup.headers.map((header) => {
 									return (
-										<TableHead key={header.id}>
+										<TableHead key={header.id} className="text-center">
 											{header.isPlaceholder
 												? null
 												: flexRender(
@@ -61,6 +69,7 @@ export function DataTable<TData, TValue>({
 							table.getRowModel().rows.map((row) => (
 								<TableRow
 									key={row.id}
+									className="text-center"
 									data-state={row.getIsSelected() && 'selected'}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>
@@ -74,9 +83,7 @@ export function DataTable<TData, TValue>({
 							))
 						) : (
 							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className="h-24 text-center">
+								<TableCell colSpan={columns.length} className="h-24">
 									No results.
 								</TableCell>
 							</TableRow>
