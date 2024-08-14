@@ -4,7 +4,7 @@ Uses google books API
 
 TODO:
 
-[ ] - Add auth :(
+[ ] - Add auth
 [ ] - connect db
 [ ] - update routes
 [ ] - create user page
