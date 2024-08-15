@@ -8,3 +8,5 @@ TODO:
 [ ] - connect db
 [ ] - update routes
 [ ] - create user page
+
+Always the same
