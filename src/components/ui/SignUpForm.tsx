@@ -15,33 +15,43 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export function LoginForm() {
+export function SignUpForm() {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState<string | null>(null)
 	const [loading, setLoading] = useState(false)
+	const [message, setMessage] = useState<string | null>(null)
 	const router = useRouter()
 	const supabase = createClientComponentClient()
 
-	const handleSignIn = async (e: React.FormEvent) => {
+	const handleSignUp = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setLoading(true)
 		setError(null)
+		setMessage(null)
 
 		try {
-			const { error } = await supabase.auth.signInWithPassword({
+			const { data, error } = await supabase.auth.signUp({
 				email,
 				password,
+				options: {
+					emailRedirectTo: `${window.location.origin}/auth/callback`,
+				},
 			})
 
 			if (error) {
 				throw error
 			}
 
-			router.push('/books')
-			router.refresh()
+			// If auto-confirmed (no email verification required)
+			if (data?.session) {
+				router.push('/books')
+				router.refresh()
+			} else {
+				setMessage('Check your email for the confirmation link!')
+			}
 		} catch (error: any) {
-			setError(error.message || 'An error occurred during sign in')
+			setError(error.message || 'An error occurred during sign up')
 		} finally {
 			setLoading(false)
 		}
@@ -50,16 +60,21 @@ export function LoginForm() {
 	return (
 		<Card className="w-full max-w-sm">
 			<CardHeader>
-				<CardTitle className="text-2xl">Login</CardTitle>
+				<CardTitle className="text-2xl">Create Account</CardTitle>
 				<CardDescription>
-					Enter your email below to login to your account.
+					Enter your email to create a new account.
 				</CardDescription>
 			</CardHeader>
-			<form onSubmit={handleSignIn}>
+			<form onSubmit={handleSignUp}>
 				<CardContent className="grid gap-4">
 					{error && (
 						<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
 							{error}
+						</div>
+					)}
+					{message && (
+						<div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+							{message}
 						</div>
 					)}
 					<div className="grid gap-2">
@@ -86,10 +101,10 @@ export function LoginForm() {
 				</CardContent>
 				<CardFooter>
 					<Button className="w-full" type="submit" disabled={loading}>
-						{loading ? 'Signing in...' : 'Sign in'}
+						{loading ? 'Creating account...' : 'Sign up'}
 					</Button>
 				</CardFooter>
 			</form>
 		</Card>
 	)
-}
+} 

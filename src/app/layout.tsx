@@ -4,6 +4,7 @@ import './globals.css'
 
 import { cn } from '@/lib/utils'
 import TopNav from '@/components/TopNav'
+import { AuthProvider } from '@/context/AuthContext'
 
 const fontSans = FontSans({
 	subsets: ['latin'],
@@ -27,8 +28,12 @@ export default function RootLayout({
 					'min-h-screen bg-background font-sans antialiased',
 					fontSans.variable
 				)}>
-				<TopNav />
-				{children}
+				<AuthProvider>
+					<TopNav />
+					<main className="container mx-auto p-4">
+						{children}
+					</main>
+				</AuthProvider>
 			</body>
 		</html>
 	)

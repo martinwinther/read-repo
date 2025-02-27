@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -21,6 +21,8 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { toast, Toaster } from 'sonner'
+import { useAuth } from '@/context/AuthContext'
+import { migrateUserBooks } from '@/lib/migrateData'
 
 interface BookWithLocation extends Book {
 	location: string
@@ -39,6 +41,13 @@ export default function AddBook() {
 	const [newLocation, setNewLocation] = useState<string>('')
 	const [selectedLocation, setSelectedLocation] = useState<string>('')
 	const [bookList, setBookList] = useState<BookWithLocation[]>([])
+	const { user, isLoading } = useAuth()
+
+	useEffect(() => {
+		if (user && !isLoading) {
+			migrateUserBooks()
+		}
+	}, [user, isLoading])
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value)
@@ -72,6 +81,10 @@ export default function AddBook() {
 		} else {
 			toast.error('Please select or add a location')
 		}
+	}
+
+	if (isLoading) {
+		return <div>Loading...</div>
 	}
 
 	return (
