@@ -87,6 +87,11 @@ export default function AddBook() {
 		return <div>Loading...</div>
 	}
 
+	// Helper function to get book cover image URL safely
+	const getBookCoverUrl = (book: Book) => {
+		return book.volumeInfo.imageLinks?.smallThumbnail || '/placeholder.png'
+	}
+
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
 			<div>
@@ -115,10 +120,7 @@ export default function AddBook() {
 							{books.map((book) => (
 								<li key={book.id} className="mb-4 flex items-start space-x-4">
 									<Image
-										src={
-											book.volumeInfo.imageLinks.smallThumbnail ||
-											'/placeholder.png'
-										}
+										src={getBookCoverUrl(book)}
 										alt={book.volumeInfo.title}
 										width={60}
 										height={90}
