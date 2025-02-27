@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { fetchBooks, Book } from '@/lib/utils'
+import { fetchBooks, Book as GoogleBook } from '@/lib/utils'
 import {
 	Dialog,
 	DialogContent,
@@ -23,16 +23,18 @@ import {
 import { toast, Toaster } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { migrateUserBooks } from '@/lib/migrateData'
+import { addBook } from '@/lib/booksService'
+import { useRouter } from 'next/navigation'
 
-interface BookWithLocation extends Book {
+interface BookWithLocation extends GoogleBook {
 	location: string
 }
 
 export default function AddBook() {
 	const [query, setQuery] = useState<string>('')
-	const [books, setBooks] = useState<Book[]>([])
+	const [books, setBooks] = useState<GoogleBook[]>([])
 	const [openDialog, setOpenDialog] = useState<boolean>(false)
-	const [selectedBook, setSelectedBook] = useState<Book | null>(null)
+	const [selectedBook, setSelectedBook] = useState<GoogleBook | null>(null)
 	const [locations, setLocations] = useState<string[]>([
 		'Living Room',
 		'Bedroom',
@@ -40,8 +42,9 @@ export default function AddBook() {
 	])
 	const [newLocation, setNewLocation] = useState<string>('')
 	const [selectedLocation, setSelectedLocation] = useState<string>('')
-	const [bookList, setBookList] = useState<BookWithLocation[]>([])
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 	const { user, isLoading } = useAuth()
+	const router = useRouter()
 
 	useEffect(() => {
 		if (user && !isLoading) {
@@ -60,27 +63,78 @@ export default function AddBook() {
 		}
 	}
 
-	const handleAddClick = (book: Book) => {
+	const handleAddClick = (book: GoogleBook) => {
 		setSelectedBook(book)
 		setOpenDialog(true)
 	}
 
-	const handleConfirm = () => {
+	const handleConfirm = async () => {
 		const location = newLocation || selectedLocation
 		if (location && selectedBook) {
-			const newBook = { ...selectedBook, location }
-			setBookList([...bookList, newBook])
-			if (newLocation) {
-				setLocations([...locations, newLocation])
+			setIsSubmitting(true)
+			
+			try {
+				// Format Google Book to match our database schema
+				const bookToAdd = {
+					title: selectedBook.volumeInfo.title,
+					author: selectedBook.volumeInfo.authors?.join(', ') || '',
+					published_date: formatPublishedDate(selectedBook.volumeInfo.publishedDate),
+					read: false,
+					location: location,
+					// Add ISBN if available
+					isbn: selectedBook.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
+				}
+				
+				// Save to Supabase
+				await addBook(bookToAdd)
+				
+				// Add new location to our list if it's new
+				if (newLocation && !locations.includes(newLocation)) {
+					setLocations([...locations, newLocation])
+				}
+				
+				toast.success(`Book added to ${location}`)
+				
+				// Close dialog and reset
+				setOpenDialog(false)
+				setSelectedBook(null)
+				setNewLocation('')
+				setSelectedLocation('')
+				
+				// Navigate to the books page after successfully adding a book
+				router.push('/books')
+				
+			} catch (error) {
+				console.error('Error adding book:', error)
+				toast.error('Failed to add book to your collection')
+			} finally {
+				setIsSubmitting(false)
 			}
-			toast.success(`Book added to ${location}`)
-			setOpenDialog(false)
-			setSelectedBook(null)
-			setNewLocation('')
-			setSelectedLocation('')
 		} else {
 			toast.error('Please select or add a location')
 		}
+	}
+
+	function formatPublishedDate(dateString?: string): string | null {
+		if (!dateString) return null;
+		
+		// Check if it's just a year
+		if (/^\d{4}$/.test(dateString)) {
+			return `${dateString}-01-01`; // Convert year to YYYY-01-01
+		}
+		
+		// Check if it's a year and month (YYYY-MM)
+		if (/^\d{4}-\d{2}$/.test(dateString)) {
+			return `${dateString}-01`; // Add day
+		}
+		
+		// Return as-is if it's already in YYYY-MM-DD format
+		if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+			return dateString;
+		}
+		
+		// Return null for invalid formats
+		return null;
 	}
 
 	if (isLoading) {
@@ -88,7 +142,7 @@ export default function AddBook() {
 	}
 
 	// Helper function to get book cover image URL safely
-	const getBookCoverUrl = (book: Book) => {
+	const getBookCoverUrl = (book: GoogleBook) => {
 		return book.volumeInfo.imageLinks?.smallThumbnail || '/placeholder.png'
 	}
 
@@ -196,7 +250,9 @@ export default function AddBook() {
 					</div>
 					<DialogFooter>
 						<Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-						<Button onClick={handleConfirm}>Confirm</Button>
+						<Button onClick={handleConfirm} disabled={isSubmitting}>
+							{isSubmitting ? 'Adding...' : 'Confirm'}
+						</Button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>

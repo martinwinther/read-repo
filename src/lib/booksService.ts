@@ -32,7 +32,7 @@ export async function getUserBooks() {
   return data as Book[];
 }
 
-// Add a new book
+// Add a new book with retry logic
 export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
   const supabase = createClientComponentClient();
   
@@ -43,21 +43,50 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
     throw new Error('You must be logged in to add a book');
   }
   
-  const { data, error } = await supabase
+  // Try using the .insert() method without an ID first
+  let result = await supabase
     .from('books')
     .insert({
-      ...book,
+      title: book.title,
+      isbn: book.isbn,
+      author: book.author,
+      published_date: book.published_date,
+      read: book.read || false,
+      location: book.location,
       user_id: user.id
     })
     .select()
     .single();
+  
+  // If we still get a duplicate key error, use a different approach
+  if (result.error && result.error.code === '23505') {
+    console.log('Trying alternative insertion method...');
     
-  if (error) {
-    console.error('Error adding book:', error);
-    throw error;
+    // Use raw SQL to insert with a generated ID
+    const { data, error } = await supabase.rpc('add_book_with_generated_id', {
+      p_title: book.title,
+      p_isbn: book.isbn,
+      p_author: book.author,
+      p_published_date: book.published_date,
+      p_read: book.read || false,
+      p_location: book.location,
+      p_user_id: user.id
+    });
+    
+    if (error) {
+      console.error('Error adding book with generated ID:', error);
+      throw error;
+    }
+    
+    return data as Book;
   }
   
-  return data as Book;
+  if (result.error) {
+    console.error('Error adding book:', result.error);
+    throw result.error;
+  }
+  
+  return result.data as Book;
 }
 
 // Update a book
