@@ -30,7 +30,7 @@ export default function Books() {
 
 	return (
 		<div className="container mx-auto py-10">
-			<DataTable columns={columns} data={books} />
+			<DataTable columns={columns} data={books.filter((book): book is Required<Book> => !!book.isbn)} />
 		</div>
 	)
 }

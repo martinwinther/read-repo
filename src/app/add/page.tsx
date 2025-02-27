@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -22,9 +22,8 @@ import {
 } from '@/components/ui/select'
 import { toast, Toaster } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
-import { migrateUserBooks } from '@/lib/migrateData'
-import { addBook } from '@/lib/booksService'
 import { useRouter } from 'next/navigation'
+import { addBook } from '@/lib/booksService'
 
 interface BookWithLocation extends GoogleBook {
 	location: string
@@ -45,12 +44,6 @@ export default function AddBook() {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 	const { user, isLoading } = useAuth()
 	const router = useRouter()
-
-	useEffect(() => {
-		if (user && !isLoading) {
-			migrateUserBooks()
-		}
-	}, [user, isLoading])
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value)
@@ -84,9 +77,11 @@ export default function AddBook() {
 					// Add ISBN if available
 					isbn: selectedBook.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
 				}
-				
-				// Save to Supabase
-				await addBook(bookToAdd)
+				// Call the server action instead of client-side function
+				const result = await addBook({
+					...bookToAdd,
+					published_date: bookToAdd.published_date || undefined
+				});
 				
 				// Add new location to our list if it's new
 				if (newLocation && !locations.includes(newLocation)) {
@@ -101,8 +96,7 @@ export default function AddBook() {
 				setNewLocation('')
 				setSelectedLocation('')
 				
-				// Navigate to the books page after successfully adding a book
-				router.push('/books')
+				// Note: The router.push is handled by the server action now
 				
 			} catch (error) {
 				console.error('Error adding book:', error)
