@@ -250,8 +250,14 @@ export const columns: ColumnDef<Book>[] = [
 		header: 'Actions',
 		cell: ({ row }) => {
 			const book = row.original;
-			const refreshBooks = React.useContext(BooksRefreshContext);
-			return <ActionsCell book={book} refreshBooks={refreshBooks} />;
+			return <ActionsCellWrapper book={book} />;
 		},
 	},
 ]
+
+// Create a proper React component that can use hooks
+function ActionsCellWrapper({ book }: { book: Book }) {
+	// Now we can use hooks in a proper component 
+	const refreshBooks = React.useContext(BooksRefreshContext);
+	return <ActionsCell book={book} refreshBooks={refreshBooks} />;
+}
