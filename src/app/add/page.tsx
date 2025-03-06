@@ -30,6 +30,22 @@ interface BookWithLocation extends GoogleBook {
 	location: string
 }
 
+// Helper to get the best ISBN from industry identifiers
+function getPreferredISBN(identifiers?: Array<{type: string, identifier: string}>): string {
+	if (!identifiers || identifiers.length === 0) return '';
+	
+	// Try to find ISBN-13 first
+	const isbn13 = identifiers.find(id => id.type === 'ISBN_13');
+	if (isbn13) return isbn13.identifier;
+	
+	// Fall back to ISBN-10
+	const isbn10 = identifiers.find(id => id.type === 'ISBN_10');
+	if (isbn10) return isbn10.identifier;
+	
+	// Last resort, use the first identifier
+	return identifiers[0].identifier;
+}
+
 export default function AddBook() {
 	const [query, setQuery] = useState<string>('')
 	const [books, setBooks] = useState<GoogleBook[]>([])
@@ -82,9 +98,10 @@ export default function AddBook() {
 					published_date: formatPublishedDate(selectedBook.volumeInfo.publishedDate),
 					read: false,
 					location: location,
-					// Add ISBN if available
-					isbn: selectedBook.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
+					// Add ISBN if available - prefer ISBN-13 over ISBN-10
+					isbn: getPreferredISBN(selectedBook.volumeInfo.industryIdentifiers),
 				}
+				
 				// Call the server action instead of client-side function
 				const result = await addBook({
 					...bookToAdd,
