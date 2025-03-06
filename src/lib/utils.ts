@@ -132,9 +132,3 @@ export async function fetchBooks(query: string): Promise<Book[]> {
 	console.log(data)
 	return data.items || []
 }
-
-function ActionsCellWrapper({ book }: { book: Book }) {
-	// Now the hook is used inside a proper React component
-	const refreshBooks = React.useContext(BooksRefreshContext);
-	return <ActionsCell book={book} refreshBooks={refreshBooks} />;
-}
