@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { updateBook } from '@/lib/booksService'
 import { toast } from 'sonner'
+import { formatIsbn } from '@/lib/utils'
 
 interface Book {
   id: number
@@ -58,7 +59,13 @@ export function EditBookDialog({ book, open, onOpenChange, onBookUpdated }: Edit
     setIsSubmitting(true)
     
     try {
-      await updateBook(book.id, formData)
+      // Format the ISBN if it's being updated
+      const updatedData = {
+        ...formData,
+        isbn: formatIsbn(formData.isbn)
+      };
+      
+      await updateBook(book.id, updatedData)
       toast.success('Book updated successfully')
       onOpenChange(false)
       onBookUpdated()

@@ -24,6 +24,7 @@ import { toast, Toaster } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { addBook } from '@/lib/booksService'
+import { BookDetailsDialog } from './BookDetailsDialog'
 
 interface BookWithLocation extends GoogleBook {
 	location: string
@@ -34,6 +35,8 @@ export default function AddBook() {
 	const [books, setBooks] = useState<GoogleBook[]>([])
 	const [openDialog, setOpenDialog] = useState<boolean>(false)
 	const [selectedBook, setSelectedBook] = useState<GoogleBook | null>(null)
+	const [openDetailsDialog, setOpenDetailsDialog] = useState<boolean>(false)
+	const [detailsBook, setDetailsBook] = useState<GoogleBook | null>(null)
 	const [locations, setLocations] = useState<string[]>([
 		'Living Room',
 		'Bedroom',
@@ -59,6 +62,11 @@ export default function AddBook() {
 	const handleAddClick = (book: GoogleBook) => {
 		setSelectedBook(book)
 		setOpenDialog(true)
+	}
+
+	const handleBookTitleClick = (book: GoogleBook) => {
+		setDetailsBook(book)
+		setOpenDetailsDialog(true)
 	}
 
 	const handleConfirm = async () => {
@@ -175,7 +183,10 @@ export default function AddBook() {
 										className="rounded-lg"
 									/>
 									<div className="flex-1">
-										<h3 className="text-xl font-bold">
+										<h3 
+											className="text-xl font-bold cursor-pointer hover:text-blue-600 hover:underline"
+											onClick={() => handleBookTitleClick(book)}
+										>
 											{book.volumeInfo.title}
 										</h3>
 										<div className="flex flex-col">
@@ -250,6 +261,14 @@ export default function AddBook() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+			
+			{/* Book Details Dialog */}
+			<BookDetailsDialog
+				book={detailsBook}
+				open={openDetailsDialog}
+				onOpenChange={setOpenDetailsDialog}
+				onAddClick={handleAddClick}
+			/>
 		</main>
 	)
 }

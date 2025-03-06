@@ -1,4 +1,5 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { formatIsbn } from './utils';
 
 // Define book type
 export interface Book {
@@ -43,10 +44,13 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
     throw new Error('You must be logged in to add a book');
   }
   
+  // Format the ISBN if provided
+  const formattedIsbn = formatIsbn(book.isbn);
+  
   // Base book data
   const bookData = {
     title: book.title,
-    isbn: book.isbn,
+    isbn: formattedIsbn,
     author: book.author,
     published_date: book.published_date,
     read: book.read || false,
@@ -68,7 +72,7 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
     // Use raw SQL to insert with a generated ID
     const { data, error } = await supabase.rpc('add_book_with_generated_id', {
       p_title: book.title,
-      p_isbn: book.isbn,
+      p_isbn: formattedIsbn,
       p_author: book.author,
       p_published_date: book.published_date,
       p_read: book.read || false,

@@ -36,6 +36,7 @@ const ActionsCell = ({ book, refreshBooks }: { book: Book, refreshBooks: () => v
 	const [editDialogOpen, setEditDialogOpen] = useState(false);
 	
 	const handleDelete = async () => {
+		console.log('Delete button clicked for book:', book.title);
 		if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
 			try {
 				await deleteBook(book.id);
@@ -49,6 +50,7 @@ const ActionsCell = ({ book, refreshBooks }: { book: Book, refreshBooks: () => v
 	};
 	
 	const openGoogleBooks = () => {
+		console.log('Google Books button clicked for book:', book.title);
 		if (!book.isbn) {
 			toast.error("This book doesn't have an ISBN to search with");
 			return;
@@ -71,18 +73,21 @@ const ActionsCell = ({ book, refreshBooks }: { book: Book, refreshBooks: () => v
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
-					<DropdownMenuItem
-						onClick={() => navigator.clipboard.writeText(book.isbn)}>
+					<DropdownMenuItem 
+						onSelect={() => {
+							navigator.clipboard.writeText(book.isbn || '');
+							toast.success('ISBN copied to clipboard');
+						}}>
 						Copy ISBN
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+					<DropdownMenuItem onSelect={() => setEditDialogOpen(true)}>
 						Edit book
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={handleDelete}>
+					<DropdownMenuItem onSelect={handleDelete}>
 						Delete book
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={openGoogleBooks}>
+					<DropdownMenuItem onSelect={openGoogleBooks}>
 						View on Google Books
 					</DropdownMenuItem>
 				</DropdownMenuContent>
