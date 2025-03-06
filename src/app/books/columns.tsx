@@ -1,6 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
 	DropdownMenu,
@@ -10,6 +10,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { deleteBook } from '@/lib/booksService'
+import { toast } from 'sonner'
+import { EditBookDialog } from './EditBookDialog'
+
+// Create a context for refresh functionality
+export const BooksRefreshContext = React.createContext<() => void>(() => {});
 
 interface Book {
 	id: number
@@ -22,7 +28,75 @@ interface Book {
 	read: boolean
 	reader?: string
 	location?: string
+	user_id: string
 }
+
+// Component for the actions cell with edit & delete functionality
+const ActionsCell = ({ book, refreshBooks }: { book: Book, refreshBooks: () => void }) => {
+	const [editDialogOpen, setEditDialogOpen] = useState(false);
+	
+	const handleDelete = async () => {
+		if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
+			try {
+				await deleteBook(book.id);
+				toast.success(`"${book.title}" deleted successfully`);
+				refreshBooks(); // Refresh the books list
+			} catch (error) {
+				console.error('Error deleting book:', error);
+				toast.error('Failed to delete book');
+			}
+		}
+	};
+	
+	const openGoogleBooks = () => {
+		if (!book.isbn) {
+			toast.error("This book doesn't have an ISBN to search with");
+			return;
+		}
+		
+		// Simply use direct Google Books search by ISBN
+		const cleanIsbn = book.isbn.replace(/-/g, ''); // Remove hyphens for better compatibility
+		const url = `https://books.google.com/books?isbn=${cleanIsbn}`;
+		window.open(url, '_blank', 'noopener,noreferrer');
+	};
+	
+	return (
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="ghost" className="h-8 w-8 p-0">
+						<span className="sr-only">Open menu</span>
+						<MoreHorizontal className="h-4 w-4" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					<DropdownMenuLabel>Actions</DropdownMenuLabel>
+					<DropdownMenuItem
+						onClick={() => navigator.clipboard.writeText(book.isbn)}>
+						Copy ISBN
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+						Edit book
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={handleDelete}>
+						Delete book
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={openGoogleBooks}>
+						View on Google Books
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+			
+			<EditBookDialog 
+				book={book} 
+				open={editDialogOpen} 
+				onOpenChange={setEditDialogOpen}
+				onBookUpdated={refreshBooks}
+			/>
+		</>
+	);
+};
 
 export const columns: ColumnDef<Book>[] = [
 	{
@@ -50,6 +124,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.author || <span className="text-gray-400">Unknown author</span>}</div>
+		}
 	},
 	{
 		accessorKey: 'isbn',
@@ -63,6 +140,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.isbn || <span className="text-gray-400">No ISBN</span>}</div>
+		}
 	},
 	{
 		accessorKey: 'published_date',
@@ -76,6 +156,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.published_date || <span className="text-gray-400">Unknown date</span>}</div>
+		}
 	},
 	{
 		accessorKey: 'purchased_date',
@@ -89,6 +172,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.purchased_date || <span className="text-gray-400">Not recorded</span>}</div>
+		}
 	},
 	{
 		accessorKey: 'purchase_location',
@@ -102,6 +188,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.purchase_location || <span className="text-gray-400">Unknown location</span>}</div>
+		}
 	},
 	{
 		accessorKey: 'read',
@@ -115,6 +204,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.read ? 'Yes' : 'No'}</div>
+		}
 	},
 	{
 		accessorKey: 'reader',
@@ -128,6 +220,9 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.reader || <span className="text-gray-400">No reader</span>}</div>
+		}
 	},
 	{
 		accessorKey: 'location',
@@ -141,33 +236,17 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return <div>{row.original.location || <span className="text-gray-400">Not shelved</span>}</div>
+		}
 	},
 	{
 		id: 'actions',
 		header: 'Actions',
 		cell: ({ row }) => {
-			const book = row.original
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<span className="sr-only">Open menu</span>
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Actions</DropdownMenuLabel>
-						<DropdownMenuItem
-							onClick={() => navigator.clipboard.writeText(book.isbn)}>
-							Copy ISBN
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>Edit book</DropdownMenuItem>
-						<DropdownMenuItem>Delete book</DropdownMenuItem>
-						<DropdownMenuItem>View on Google Books</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			)
+			const book = row.original;
+			const refreshBooks = React.useContext(BooksRefreshContext);
+			return <ActionsCell book={book} refreshBooks={refreshBooks} />;
 		},
 	},
 ]

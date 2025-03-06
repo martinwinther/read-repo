@@ -43,18 +43,21 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
     throw new Error('You must be logged in to add a book');
   }
   
+  // Base book data
+  const bookData = {
+    title: book.title,
+    isbn: book.isbn,
+    author: book.author,
+    published_date: book.published_date,
+    read: book.read || false,
+    location: book.location,
+    user_id: user.id
+  };
+  
   // Try using the .insert() method without an ID first
   let result = await supabase
     .from('books')
-    .insert({
-      title: book.title,
-      isbn: book.isbn,
-      author: book.author,
-      published_date: book.published_date,
-      read: book.read || false,
-      location: book.location,
-      user_id: user.id
-    })
+    .insert(bookData)
     .select()
     .single();
   
