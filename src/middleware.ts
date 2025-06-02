@@ -28,8 +28,8 @@ export async function middleware(req: NextRequest) {
 // Helper function to determine public routes
 function isPublicRoute(pathname: string) {
   // List of routes that don't require authentication
-  const publicRoutes = ['/login', '/'];
-  return publicRoutes.includes(pathname);
+  const publicRoutes = ['/login', '/', '/auth/reset-password'];
+  return publicRoutes.includes(pathname) || pathname.startsWith('/auth/');
 }
 
 export const config = {

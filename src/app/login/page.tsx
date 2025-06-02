@@ -2,14 +2,16 @@
 
 import { LoginForm } from '@/components/ui/LoginForm';
 import { SignUpForm } from '@/components/ui/SignUpForm';
+import { ResetPasswordForm } from '@/components/ui/ResetPasswordForm';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
-  const [view, setView] = useState<'sign-in' | 'sign-up'>('sign-in');
+  const [view, setView] = useState<'sign-in' | 'sign-up' | 'reset-password'>('sign-in');
   const router = useRouter();
   const supabase = createClientComponentClient();
   
@@ -25,23 +27,27 @@ export default function LoginPage() {
   
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh]">
-      <div className="w-full max-w-md space-y-6">
-        <div className="flex justify-center space-x-4 mb-4">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex justify-center items-center space-x-4">
           <Button 
             variant={view === 'sign-in' ? 'default' : 'outline'}
             onClick={() => setView('sign-in')}
+            className="w-24"
           >
             Sign In
           </Button>
           <Button 
             variant={view === 'sign-up' ? 'default' : 'outline'}
             onClick={() => setView('sign-up')}
+            className="w-24"
           >
             Sign Up
           </Button>
         </div>
         
-        {view === 'sign-in' ? <LoginForm /> : <SignUpForm />}
+        {view === 'sign-in' && <LoginForm onViewChange={setView} />}
+        {view === 'sign-up' && <SignUpForm onViewChange={setView} />}
+        {view === 'reset-password' && <ResetPasswordForm onViewChange={setView} />}
       </div>
     </div>
   );

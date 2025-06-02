@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,37 +14,35 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-interface LoginFormProps {
+interface ResetPasswordFormProps {
 	onViewChange: (view: 'sign-in' | 'sign-up' | 'reset-password') => void;
 }
 
-export function LoginForm({ onViewChange }: LoginFormProps) {
+export function ResetPasswordForm({ onViewChange }: ResetPasswordFormProps) {
 	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
 	const [error, setError] = useState<string | null>(null)
+	const [success, setSuccess] = useState(false)
 	const [loading, setLoading] = useState(false)
-	const router = useRouter()
 	const supabase = createClientComponentClient()
 
-	const handleSignIn = async (e: React.FormEvent) => {
+	const handleResetPassword = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setLoading(true)
 		setError(null)
+		setSuccess(false)
 
 		try {
-			const { error } = await supabase.auth.signInWithPassword({
-				email,
-				password,
+			const { error } = await supabase.auth.resetPasswordForEmail(email, {
+				redirectTo: `${window.location.origin}/auth/reset-password`,
 			})
 
 			if (error) {
 				throw error
 			}
 
-			router.push('/books')
-			router.refresh()
+			setSuccess(true)
 		} catch (error: any) {
-			setError(error.message || 'An error occurred during sign in')
+			setError(error.message || 'An error occurred while sending the reset email')
 		} finally {
 			setLoading(false)
 		}
@@ -54,16 +51,21 @@ export function LoginForm({ onViewChange }: LoginFormProps) {
 	return (
 		<Card className="w-full max-w-sm">
 			<CardHeader>
-				<CardTitle className="text-2xl">Login</CardTitle>
+				<CardTitle className="text-2xl">Reset Password</CardTitle>
 				<CardDescription>
-					Enter your email below to login to your account.
+					Enter your email address and we'll send you a link to reset your password.
 				</CardDescription>
 			</CardHeader>
-			<form onSubmit={handleSignIn}>
+			<form onSubmit={handleResetPassword}>
 				<CardContent className="grid gap-4">
 					{error && (
 						<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
 							{error}
+						</div>
+					)}
+					{success && (
+						<div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+							Check your email for a password reset link.
 						</div>
 					)}
 					<div className="grid gap-2">
@@ -77,32 +79,21 @@ export function LoginForm({ onViewChange }: LoginFormProps) {
 							onChange={(e) => setEmail(e.target.value)}
 						/>
 					</div>
-					<div className="grid gap-2">
-						<Label htmlFor="password">Password</Label>
-						<Input 
-							id="password" 
-							type="password" 
-							required 
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-						/>
-					</div>
-					<div className="text-right">
-						<button
-							type="button"
-							onClick={() => onViewChange('reset-password')}
-							className="text-sm text-muted-foreground hover:text-primary"
-						>
-							Forgot your password?
-						</button>
-					</div>
 				</CardContent>
-				<CardFooter>
+				<CardFooter className="flex flex-col gap-2">
 					<Button className="w-full" type="submit" disabled={loading}>
-						{loading ? 'Signing in...' : 'Sign in'}
+						{loading ? 'Sending...' : 'Send Reset Link'}
+					</Button>
+					<Button 
+						variant="ghost" 
+						className="w-full" 
+						type="button"
+						onClick={() => onViewChange('sign-in')}
+					>
+						Back to Sign In
 					</Button>
 				</CardFooter>
 			</form>
 		</Card>
 	)
-}
+} 

@@ -15,7 +15,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export function SignUpForm() {
+interface SignUpFormProps {
+	onViewChange: (view: 'sign-in' | 'sign-up' | 'reset-password') => void;
+}
+
+export function SignUpForm({ onViewChange }: SignUpFormProps) {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState<string | null>(null)
@@ -99,9 +103,17 @@ export function SignUpForm() {
 						/>
 					</div>
 				</CardContent>
-				<CardFooter>
+				<CardFooter className="flex flex-col gap-2">
 					<Button className="w-full" type="submit" disabled={loading}>
 						{loading ? 'Creating account...' : 'Sign up'}
+					</Button>
+					<Button 
+						variant="ghost" 
+						className="w-full" 
+						type="button"
+						onClick={() => onViewChange('sign-in')}
+					>
+						Already have an account? Sign in
 					</Button>
 				</CardFooter>
 			</form>
