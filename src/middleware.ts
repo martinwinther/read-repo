@@ -10,10 +10,10 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // If no session and trying to access a protected route, redirect to login
+  // If no session and trying to access a protected route, redirect to the root page (now the main login page)
   if (!session && !isPublicRoute(req.nextUrl.pathname)) {
-    const loginUrl = new URL('/login', req.url);
-    return NextResponse.redirect(loginUrl);
+    const rootUrl = new URL('/', req.url);
+    return NextResponse.redirect(rootUrl);
   }
 
   // If has session and trying to access root route, redirect to books
@@ -28,7 +28,8 @@ export async function middleware(req: NextRequest) {
 // Helper function to determine public routes
 function isPublicRoute(pathname: string) {
   // List of routes that don't require authentication
-  const publicRoutes = ['/login', '/', '/auth/reset-password'];
+  // /login is removed, / is the main public entry, /auth/* for callbacks
+  const publicRoutes = ['/', '/auth/reset-password']; 
   return publicRoutes.includes(pathname) || pathname.startsWith('/auth/');
 }
 

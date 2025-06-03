@@ -30,7 +30,7 @@ export default function TopNav() {
 						</span>
 					</>
 				) : (
-					<Link href="/login">
+					<Link href="/">
 						<Button variant={'outline'}>Login</Button>
 					</Link>
 				)}

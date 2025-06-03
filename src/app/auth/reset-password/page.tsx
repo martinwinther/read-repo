@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
 
 			setMessage('Password updated successfully! Redirecting to login...')
 			setTimeout(() => {
-				router.push('/login')
+				router.push('/')
 			}, 2000)
 		} catch (error: any) {
 			setError(error.message || 'An error occurred while updating your password')
