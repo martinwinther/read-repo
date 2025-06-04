@@ -29,14 +29,14 @@ export default function HomePage() {
 			<div className="w-full max-w-sm space-y-6">
 				<div className="flex justify-center items-center space-x-4">
 					<Button 
-						variant={view === 'sign-in' ? 'default' : 'outline'}
+						variant={view === 'sign-in' ? 'secondary' : 'ghost'}
 						onClick={() => setView('sign-in')}
 						className="w-24"
 					>
 						Sign In
 					</Button>
 					<Button 
-						variant={view === 'sign-up' ? 'default' : 'outline'}
+						variant={view === 'sign-up' ? 'secondary' : 'ghost'}
 						onClick={() => setView('sign-up')}
 						className="w-24"
 					>
