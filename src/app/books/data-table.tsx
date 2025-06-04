@@ -52,6 +52,7 @@ interface Book {
 	read: boolean
 	reader?: string
 	location?: string
+	user_id: string
 }
 
 interface DataTableProps<TData> {
