@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
 	const [password, setPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
 	const [error, setError] = useState<string | null>(null)
@@ -83,54 +83,68 @@ export default function ResetPasswordPage() {
 	}
 
 	return (
+		<Card className="w-full max-w-sm">
+			<CardHeader>
+				<CardTitle className="text-2xl">Reset Password</CardTitle>
+				<CardDescription>
+					Enter your new password below.
+				</CardDescription>
+			</CardHeader>
+			<form onSubmit={handleResetPassword}>
+				<CardContent className="grid gap-4">
+					{error && (
+						<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+							{error}
+						</div>
+					)}
+					{message && (
+						<div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+							{message}
+						</div>
+					)}
+					<div className="grid gap-2">
+						<Label htmlFor="password">New Password</Label>
+						<Input
+							id="password"
+							type="password"
+							required
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+						/>
+					</div>
+					<div className="grid gap-2">
+						<Label htmlFor="confirmPassword">Confirm Password</Label>
+						<Input
+							id="confirmPassword"
+							type="password"
+							required
+							value={confirmPassword}
+							onChange={(e) => setConfirmPassword(e.target.value)}
+						/>
+					</div>
+				</CardContent>
+				<CardFooter>
+					<Button className="w-full" type="submit" disabled={loading}>
+						{loading ? 'Updating...' : 'Update Password'}
+					</Button>
+				</CardFooter>
+			</form>
+		</Card>
+	)
+}
+
+export default function ResetPasswordPage() {
+	return (
 		<div className="flex flex-col items-center justify-center min-h-[80vh]">
-			<Card className="w-full max-w-sm">
-				<CardHeader>
-					<CardTitle className="text-2xl">Reset Password</CardTitle>
-					<CardDescription>
-						Enter your new password below.
-					</CardDescription>
-				</CardHeader>
-				<form onSubmit={handleResetPassword}>
-					<CardContent className="grid gap-4">
-						{error && (
-							<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-								{error}
-							</div>
-						)}
-						{message && (
-							<div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-								{message}
-							</div>
-						)}
-						<div className="grid gap-2">
-							<Label htmlFor="password">New Password</Label>
-							<Input
-								id="password"
-								type="password"
-								required
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="confirmPassword">Confirm Password</Label>
-							<Input
-								id="confirmPassword"
-								type="password"
-								required
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-							/>
-						</div>
+			<Suspense fallback={
+				<Card className="w-full max-w-sm">
+					<CardContent className="py-8 text-center">
+						Loading...
 					</CardContent>
-					<CardFooter>
-						<Button className="w-full" type="submit" disabled={loading}>
-							{loading ? 'Updating...' : 'Update Password'}
-						</Button>
-					</CardFooter>
-				</form>
-			</Card>
+				</Card>
+			}>
+				<ResetPasswordForm />
+			</Suspense>
 		</div>
 	)
 } 
