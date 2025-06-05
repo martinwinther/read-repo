@@ -18,6 +18,22 @@ interface ResetPasswordFormProps {
 	onViewChange: (view: 'sign-in' | 'sign-up' | 'reset-password') => void;
 }
 
+// Get the correct base URL for redirects
+function getBaseUrl() {
+	// In production, use the Vercel URL
+	if (process.env.NODE_ENV === 'production') {
+		return 'https://read-repo.vercel.app'
+	}
+	
+	// In development, use localhost
+	if (typeof window !== 'undefined') {
+		return window.location.origin
+	}
+	
+	// Fallback
+	return 'http://localhost:3000'
+}
+
 export function ResetPasswordForm({ onViewChange }: ResetPasswordFormProps) {
 	const [email, setEmail] = useState('')
 	const [error, setError] = useState<string | null>(null)
@@ -33,7 +49,7 @@ export function ResetPasswordForm({ onViewChange }: ResetPasswordFormProps) {
 
 		try {
 			const { error } = await supabase.auth.resetPasswordForEmail(email, {
-				redirectTo: `${window.location.origin}/auth/reset-password`,
+				redirectTo: `${getBaseUrl()}/auth/reset-password`,
 			})
 
 			if (error) {
