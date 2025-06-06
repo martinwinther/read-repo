@@ -91,25 +91,25 @@ function BookCard({ book }: { book: Book }) {
 
 	return (
 		<>
-			<Card className="w-full">
-				<CardHeader className="pb-3">
-					<div className="flex justify-between items-start">
+			<Card className="w-full bg-card/50 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+				<CardHeader className="pb-4">
+					<div className="flex justify-between items-start gap-4">
 						<div className="flex-1 min-w-0">
-							<CardTitle className="text-lg font-semibold leading-tight mb-1">
+							<CardTitle className="text-lg font-semibold leading-tight mb-2 text-foreground">
 								{book.title}
 							</CardTitle>
-							<p className="text-sm text-muted-foreground mb-2">
+							<p className="text-sm text-muted-foreground mb-3 leading-relaxed">
 								{book.author || 'Unknown author'}
 							</p>
 						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" className="h-8 w-8 p-0 ml-2">
+								<Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-accent/80">
 									<MoreHorizontal className="h-4 w-4" />
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuLabel>Actions</DropdownMenuLabel>
+							<DropdownMenuContent align="end" className="w-56">
+								<DropdownMenuLabel className="font-semibold">Actions</DropdownMenuLabel>
 								<DropdownMenuItem 
 									onSelect={() => {
 										navigator.clipboard.writeText(book.isbn || '')
@@ -121,7 +121,7 @@ function BookCard({ book }: { book: Book }) {
 								<DropdownMenuItem onSelect={() => setEditDialogOpen(true)}>
 									Edit book
 								</DropdownMenuItem>
-								<DropdownMenuItem onSelect={handleDelete}>
+								<DropdownMenuItem onSelect={handleDelete} className="text-destructive">
 									Delete book
 								</DropdownMenuItem>
 								<DropdownMenuItem onSelect={openGoogleBooks}>
@@ -132,48 +132,49 @@ function BookCard({ book }: { book: Book }) {
 					</div>
 					
 					<div className="flex flex-wrap gap-2">
-						<Badge variant={book.read ? "default" : "secondary"}>
+						<Badge 
+							variant={book.read ? "default" : "secondary"} 
+							className="rounded-full px-3 py-1 text-xs font-medium"
+						>
 							{book.read ? "Read" : "Unread"}
 						</Badge>
 						{book.location && (
-							<Badge variant="outline">{book.location}</Badge>
+							<Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
+								{book.location}
+							</Badge>
 						)}
 						{book.reader && book.reader !== book.author && (
-							<Badge variant="outline">Reader: {book.reader}</Badge>
+							<Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
+								Reader: {book.reader}
+							</Badge>
 						)}
 					</div>
 				</CardHeader>
 				
-				<CardContent className="pt-0">
-					<div className="space-y-2 text-sm">
-						{book.published_date && (
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">Published:</span>
-								<span>{book.published_date}</span>
-							</div>
-						)}
-						{book.purchased_date && (
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">Purchased:</span>
-								<span>{book.purchased_date}</span>
-							</div>
-						)}
-						{book.purchase_location && (
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">From:</span>
-								<span>{book.purchase_location}</span>
-							</div>
-						)}
-					</div>
+				<CardContent className="pt-0 space-y-3">
+					{book.published_date && (
+						<div className="flex justify-between items-center py-2 border-b border-border/50">
+							<span className="text-sm text-muted-foreground font-medium">Published</span>
+							<span className="text-sm font-medium">{book.published_date}</span>
+						</div>
+					)}
+					{book.purchased_date && (
+						<div className="flex justify-between items-center py-2 border-b border-border/50">
+							<span className="text-sm text-muted-foreground font-medium">Purchased</span>
+							<span className="text-sm font-medium">{book.purchased_date}</span>
+						</div>
+					)}
+					{book.purchase_location && (
+						<div className="flex justify-between items-center py-2 border-b border-border/50">
+							<span className="text-sm text-muted-foreground font-medium">From</span>
+							<span className="text-sm font-medium">{book.purchase_location}</span>
+						</div>
+					)}
 					
-					{(book.isbn || showDetails) && (
-						<div className="mt-3 pt-3 border-t space-y-2 text-sm">
-							{book.isbn && (
-								<div className="flex justify-between">
-									<span className="text-muted-foreground">ISBN:</span>
-									<span className="font-mono text-xs">{book.isbn}</span>
-								</div>
-							)}
+					{book.isbn && (
+						<div className="flex justify-between items-center py-2">
+							<span className="text-sm text-muted-foreground font-medium">ISBN</span>
+							<span className="text-xs font-mono bg-muted px-2 py-1 rounded-md">{book.isbn}</span>
 						</div>
 					)}
 				</CardContent>
@@ -265,13 +266,13 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 	const filteredRows = table.getRowModel().rows
 
 	return (
-		<div>
-			<div className="flex items-center py-4">
+		<div className="space-y-6">
+			<div className="flex items-center gap-4 p-1">
 				<Input
 					placeholder="Search books..."
 					value={globalFilter}
 					onChange={(event) => setGlobalFilter(event.target.value)}
-					className="max-w-sm"
+					className="max-w-sm bg-background/80 backdrop-blur-sm"
 				/>
 				{/* Hide column selector on mobile since cards don't use it */}
 				<DropdownMenu>
@@ -308,23 +309,24 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 						<BookCard key={row.id} book={row.original} />
 					))
 				) : (
-					<Card>
-						<CardContent className="py-8 text-center text-muted-foreground">
-							No results found.
+					<Card className="bg-card/50 backdrop-blur-sm border-0 shadow-md">
+						<CardContent className="py-12 text-center">
+							<p className="text-muted-foreground text-lg">No books found.</p>
+							<p className="text-muted-foreground/70 text-sm mt-2">Try adjusting your search terms.</p>
 						</CardContent>
 					</Card>
 				)}
 			</div>
 
 			{/* Desktop Table View */}
-			<div className="hidden md:block rounded-md border">
+			<div className="hidden md:block">
 				<Table>
-					<TableHeader className="">
+					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id} className="text-center bg-gray-50">
+							<TableRow key={headerGroup.id} className="bg-muted/30 hover:bg-muted/40">
 								{headerGroup.headers.map((header) => {
 									return (
-										<TableHead key={header.id} className="text-center">
+										<TableHead key={header.id} className="text-center font-semibold">
 											{header.isPlaceholder
 												? null
 												: flexRender(
@@ -342,7 +344,7 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 							filteredRows.map((row) => (
 								<TableRow
 									key={row.id}
-									className="text-center"
+									className="text-center hover:bg-muted/20"
 									data-state={row.getIsSelected() && 'selected'}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>
@@ -356,8 +358,9 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={columns.length} className="h-24">
-									No results.
+								<TableCell colSpan={columns.length} className="h-24 text-center">
+									<p className="text-muted-foreground text-lg">No books found.</p>
+									<p className="text-muted-foreground/70 text-sm mt-2">Try adjusting your search terms.</p>
 								</TableCell>
 							</TableRow>
 						)}
@@ -366,19 +369,31 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 			</div>
 
 			{/* Pagination */}
-			<div className="flex items-center justify-end space-x-2 py-4 pr-4">
+			<div className="flex items-center justify-center space-x-3 py-4">
 				<Button
 					variant="outline"
 					size="sm"
 					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}>
+					disabled={!table.getCanPreviousPage()}
+					className="px-4">
 					Previous
 				</Button>
+				<div className="flex items-center gap-2 text-sm text-muted-foreground">
+					<span>Page</span>
+					<span className="font-medium text-foreground">
+						{table.getState().pagination.pageIndex + 1}
+					</span>
+					<span>of</span>
+					<span className="font-medium text-foreground">
+						{table.getPageCount()}
+					</span>
+				</div>
 				<Button
 					variant="outline"
 					size="sm"
 					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}>
+					disabled={!table.getCanNextPage()}
+					className="px-4">
 					Next
 				</Button>
 			</div>
