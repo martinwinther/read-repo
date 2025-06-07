@@ -81,119 +81,117 @@ export function EditBookDialog({ book, open, onOpenChange, onBookUpdated }: Edit
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-w-md sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit Book</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">Title</Label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form Fields - Simple stacked layout for mobile */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
               <Input
                 id="title"
                 name="title"
                 value={formData.title || ''}
                 onChange={handleChange}
-                className="col-span-3"
                 required
+                placeholder="Enter book title"
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="author" className="text-right">Author</Label>
+            <div className="space-y-2">
+              <Label htmlFor="author" className="text-sm font-medium">Author</Label>
               <Input
                 id="author"
                 name="author"
                 value={formData.author || ''}
                 onChange={handleChange}
-                className="col-span-3"
+                placeholder="Enter author name"
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="isbn" className="text-right">ISBN</Label>
+            <div className="space-y-2">
+              <Label htmlFor="isbn" className="text-sm font-medium">ISBN</Label>
               <Input
                 id="isbn"
                 name="isbn"
                 value={formData.isbn || ''}
                 onChange={handleChange}
-                className="col-span-3"
+                placeholder="Enter ISBN"
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="published_date" className="text-right">Published Date</Label>
-              <Input
-                id="published_date"
-                name="published_date"
-                type="date"
-                value={formData.published_date?.substring(0, 10) || ''}
-                onChange={handleChange}
-                className="col-span-3"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="published_date" className="text-sm font-medium">Published Date</Label>
+                <Input
+                  id="published_date"
+                  name="published_date"
+                  type="date"
+                  value={formData.published_date?.substring(0, 10) || ''}
+                  onChange={handleChange}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="purchased_date" className="text-sm font-medium">Purchased Date</Label>
+                <Input
+                  id="purchased_date"
+                  name="purchased_date"
+                  type="date"
+                  value={formData.purchased_date?.substring(0, 10) || ''}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="purchased_date" className="text-right">Purchased Date</Label>
-              <Input
-                id="purchased_date"
-                name="purchased_date"
-                type="date"
-                value={formData.purchased_date?.substring(0, 10) || ''}
-                onChange={handleChange}
-                className="col-span-3"
-              />
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="purchase_location" className="text-right">Purchase Location</Label>
+            <div className="space-y-2">
+              <Label htmlFor="purchase_location" className="text-sm font-medium">Purchase Location</Label>
               <Input
                 id="purchase_location"
                 name="purchase_location"
                 value={formData.purchase_location || ''}
                 onChange={handleChange}
-                className="col-span-3"
+                placeholder="Where did you buy this book?"
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="read" className="text-right">Read</Label>
-              <div className="col-span-3 flex items-center space-x-2">
-                <Checkbox 
-                  id="read" 
-                  checked={formData.read || false} 
-                  onCheckedChange={handleCheckboxChange} 
-                />
-                <label htmlFor="read" className="text-sm font-medium">
-                  Mark as read
-                </label>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="reader" className="text-right">Reader</Label>
+            <div className="space-y-2">
+              <Label htmlFor="reader" className="text-sm font-medium">Reader</Label>
               <Input
                 id="reader"
                 name="reader"
                 value={formData.reader || ''}
                 onChange={handleChange}
-                className="col-span-3"
+                placeholder="Who is reading this book?"
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">Location</Label>
+            <div className="space-y-2">
+              <Label htmlFor="location" className="text-sm font-medium">Location</Label>
               <Input
                 id="location"
                 name="location"
                 value={formData.location || ''}
                 onChange={handleChange}
-                className="col-span-3"
+                placeholder="Where is this book located?"
               />
+            </div>
+            
+            <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg">
+              <Checkbox 
+                id="read" 
+                checked={formData.read || false} 
+                onCheckedChange={handleCheckboxChange} 
+              />
+              <Label htmlFor="read" className="text-sm font-medium cursor-pointer">
+                Mark as read
+              </Label>
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
@@ -205,4 +203,4 @@ export function EditBookDialog({ book, open, onOpenChange, onBookUpdated }: Edit
       </DialogContent>
     </Dialog>
   )
-} 
+}

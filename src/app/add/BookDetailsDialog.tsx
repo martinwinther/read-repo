@@ -42,7 +42,7 @@ export function BookDetailsDialog({ book, open, onOpenChange, onAddClick }: Book
     return (
       <div className="flex flex-wrap gap-2 mt-2">
         {book.volumeInfo.categories.map((category, index) => (
-          <Badge key={index} variant="secondary">{category}</Badge>
+          <Badge key={index} variant="secondary" className="text-xs">{category}</Badge>
         ))}
       </div>
     )
@@ -82,38 +82,38 @@ export function BookDetailsDialog({ book, open, onOpenChange, onAddClick }: Book
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{book.volumeInfo.title}</DialogTitle>
+      <DialogContent className="max-w-md sm:max-w-lg lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-lg sm:text-xl leading-tight">{book.volumeInfo.title}</DialogTitle>
           {book.volumeInfo.subtitle && (
-            <p className="text-sm text-muted-foreground">{book.volumeInfo.subtitle}</p>
+            <p className="text-sm text-muted-foreground mt-1">{book.volumeInfo.subtitle}</p>
           )}
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
-          {/* Book Cover */}
-          <div className="flex justify-center">
+        <div className="space-y-4 pb-4">
+          {/* Book Cover - Centered on mobile, left-aligned on desktop */}
+          <div className="flex justify-center sm:justify-start">
             <Image
               src={getCoverImage()}
               alt={book.volumeInfo.title}
-              width={150}
-              height={225}
-              className="rounded-md shadow-md object-contain"
+              width={120}
+              height={180}
+              className="rounded-lg shadow-md object-contain sm:w-32 sm:h-48"
             />
           </div>
           
-          {/* Book Details */}
-          <div className="md:col-span-2 space-y-3">
+          {/* Book Details - Stacked layout */}
+          <div className="space-y-3">
             {/* Authors */}
             <div>
-              <h4 className="font-semibold">Author(s):</h4>
-              <p>{book.volumeInfo.authors?.join(', ') || 'Unknown'}</p>
+              <h4 className="font-semibold text-sm text-muted-foreground mb-1">Author(s)</h4>
+              <p className="text-sm">{book.volumeInfo.authors?.join(', ') || 'Unknown'}</p>
             </div>
             
             {/* Publisher & Date */}
             <div>
-              <h4 className="font-semibold">Publisher:</h4>
-              <p>
+              <h4 className="font-semibold text-sm text-muted-foreground mb-1">Publisher</h4>
+              <p className="text-sm">
                 {book.volumeInfo.publisher || 'Unknown'} 
                 {book.volumeInfo.publishedDate ? ` (${book.volumeInfo.publishedDate})` : ''}
               </p>
@@ -121,60 +121,60 @@ export function BookDetailsDialog({ book, open, onOpenChange, onAddClick }: Book
             
             {/* ISBN */}
             <div>
-              <h4 className="font-semibold">ISBN:</h4>
-              <p>{getISBN()}</p>
+              <h4 className="font-semibold text-sm text-muted-foreground mb-1">ISBN</h4>
+              <p className="text-sm font-mono bg-muted px-2 py-1 rounded text-xs">{getISBN()}</p>
             </div>
             
             {/* Page Count */}
             {book.volumeInfo.pageCount && (
               <div>
-                <h4 className="font-semibold">Pages:</h4>
-                <p>{book.volumeInfo.pageCount}</p>
-              </div>
-            )}
-            
-            {/* Categories */}
-            {book.volumeInfo.categories && book.volumeInfo.categories.length > 0 && (
-              <div>
-                <h4 className="font-semibold">Categories:</h4>
-                {renderCategories()}
+                <h4 className="font-semibold text-sm text-muted-foreground mb-1">Pages</h4>
+                <p className="text-sm">{book.volumeInfo.pageCount}</p>
               </div>
             )}
             
             {/* Language */}
             <div>
-              <h4 className="font-semibold">Language:</h4>
-              <p>{book.volumeInfo.language === 'en' ? 'English' : book.volumeInfo.language}</p>
+              <h4 className="font-semibold text-sm text-muted-foreground mb-1">Language</h4>
+              <p className="text-sm">{book.volumeInfo.language === 'en' ? 'English' : book.volumeInfo.language}</p>
             </div>
+            
+            {/* Categories */}
+            {book.volumeInfo.categories && book.volumeInfo.categories.length > 0 && (
+              <div>
+                <h4 className="font-semibold text-sm text-muted-foreground mb-1">Categories</h4>
+                {renderCategories()}
+              </div>
+            )}
           </div>
+          
+          {/* Description */}
+          {book.volumeInfo.description && (
+            <div>
+              <h4 className="font-semibold text-sm text-muted-foreground mb-2">Description</h4>
+              <div 
+                className="text-sm leading-relaxed max-h-32 overflow-y-auto bg-muted/30 p-3 rounded-lg"
+                dangerouslySetInnerHTML={{ __html: book.volumeInfo.description }}
+              />
+            </div>
+          )}
         </div>
         
-        {/* Description */}
-        {book.volumeInfo.description && (
-          <div className="mt-2">
-            <h4 className="font-semibold">Description:</h4>
-            <div 
-              className="text-sm mt-1 max-h-[200px] overflow-y-auto"
-              dangerouslySetInnerHTML={{ __html: book.volumeInfo.description }}
-            />
-          </div>
-        )}
-        
-        <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="pt-4 border-t flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="order-3 sm:order-1">
             Close
           </Button>
           <Button 
             variant="outline" 
             onClick={openGoogleBooks}
-            className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+            className="order-2 bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:hover:bg-blue-900 dark:border-blue-800"
           >
             View on Google Books
           </Button>
           <Button onClick={() => {
             onAddClick(book);
             onOpenChange(false);
-          }}>
+          }} className="order-1 sm:order-3">
             Add to Collection
           </Button>
         </DialogFooter>
