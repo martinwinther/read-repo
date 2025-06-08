@@ -91,11 +91,11 @@ function BookCard({ book }: { book: Book }) {
 
 	return (
 		<>
-			<Card className="w-full bg-card/50 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-				<CardHeader className="pb-4">
-					<div className="flex justify-between items-start gap-4">
+			<Card className="w-full bg-card backdrop-blur-sm border shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+				<CardHeader className="pb-3">
+					<div className="flex items-start gap-3">
 						<div className="flex-1 min-w-0">
-							<CardTitle className="text-lg font-semibold leading-tight mb-2 text-foreground">
+							<CardTitle className="text-base font-semibold leading-tight mb-1 text-foreground line-clamp-2">
 								{book.title}
 							</CardTitle>
 							<p className="text-sm text-muted-foreground mb-3 leading-relaxed">
@@ -104,7 +104,7 @@ function BookCard({ book }: { book: Book }) {
 						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
-								<Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-accent/80">
+								<Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-accent/80 shrink-0">
 									<MoreHorizontal className="h-4 w-4" />
 								</Button>
 							</DropdownMenuTrigger>
@@ -131,50 +131,50 @@ function BookCard({ book }: { book: Book }) {
 						</DropdownMenu>
 					</div>
 					
-					<div className="flex flex-wrap gap-2">
+					<div className="flex flex-wrap gap-1.5">
 						<Badge 
 							variant={book.read ? "default" : "secondary"} 
-							className="rounded-full px-3 py-1 text-xs font-medium"
+							className="rounded-full px-2.5 py-0.5 text-xs font-medium"
 						>
 							{book.read ? "Read" : "Unread"}
 						</Badge>
 						{book.location && (
-							<Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
+							<Badge variant="outline" className="rounded-full px-2.5 py-0.5 text-xs">
 								{book.location}
 							</Badge>
 						)}
 						{book.reader && book.reader !== book.author && (
-							<Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
+							<Badge variant="outline" className="rounded-full px-2.5 py-0.5 text-xs">
 								Reader: {book.reader}
 							</Badge>
 						)}
 					</div>
 				</CardHeader>
 				
-				<CardContent className="pt-0 space-y-3">
+				<CardContent className="pt-0 space-y-2">
 					{book.published_date && (
-						<div className="flex justify-between items-center py-2 border-b border-border/50">
-							<span className="text-sm text-muted-foreground font-medium">Published</span>
-							<span className="text-sm font-medium">{book.published_date}</span>
+						<div className="flex justify-between items-center py-1.5 border-b border-border/40">
+							<span className="text-xs text-muted-foreground font-medium">Published</span>
+							<span className="text-xs font-medium">{book.published_date}</span>
 						</div>
 					)}
 					{book.purchased_date && (
-						<div className="flex justify-between items-center py-2 border-b border-border/50">
-							<span className="text-sm text-muted-foreground font-medium">Purchased</span>
-							<span className="text-sm font-medium">{book.purchased_date}</span>
+						<div className="flex justify-between items-center py-1.5 border-b border-border/40">
+							<span className="text-xs text-muted-foreground font-medium">Purchased</span>
+							<span className="text-xs font-medium">{book.purchased_date}</span>
 						</div>
 					)}
 					{book.purchase_location && (
-						<div className="flex justify-between items-center py-2 border-b border-border/50">
-							<span className="text-sm text-muted-foreground font-medium">From</span>
-							<span className="text-sm font-medium">{book.purchase_location}</span>
+						<div className="flex justify-between items-center py-1.5 border-b border-border/40">
+							<span className="text-xs text-muted-foreground font-medium">From</span>
+							<span className="text-xs font-medium truncate ml-2">{book.purchase_location}</span>
 						</div>
 					)}
 					
 					{book.isbn && (
-						<div className="flex justify-between items-center py-2">
-							<span className="text-sm text-muted-foreground font-medium">ISBN</span>
-							<span className="text-xs font-mono bg-muted px-2 py-1 rounded-md">{book.isbn}</span>
+						<div className="flex justify-between items-center py-1.5">
+							<span className="text-xs text-muted-foreground font-medium">ISBN</span>
+							<span className="text-xs font-mono bg-muted px-2 py-0.5 rounded text-xs">{book.isbn}</span>
 						</div>
 					)}
 				</CardContent>
@@ -266,18 +266,19 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 	const filteredRows = table.getRowModel().rows
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center gap-4 p-1">
+		<div className="w-full">
+			{/* Search and Controls */}
+			<div className="flex items-center gap-3 mb-6 px-1">
 				<Input
 					placeholder="Search books..."
 					value={globalFilter}
 					onChange={(event) => setGlobalFilter(event.target.value)}
-					className="max-w-sm bg-background/80 backdrop-blur-sm"
+					className="flex-1 bg-background/80 backdrop-blur-sm"
 				/>
 				{/* Hide column selector on mobile since cards don't use it */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant="outline" className="ml-auto hidden md:flex">
+						<Button variant="outline" className="hidden md:flex shrink-0">
 							Columns
 						</Button>
 					</DropdownMenuTrigger>
@@ -303,19 +304,21 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 			</div>
 
 			{/* Mobile Card View */}
-			<div className="md:hidden space-y-4">
-				{filteredRows?.length ? (
-					filteredRows.map((row) => (
-						<BookCard key={row.id} book={row.original} />
-					))
-				) : (
-					<Card className="bg-card/50 backdrop-blur-sm border-0 shadow-md">
-						<CardContent className="py-12 text-center">
-							<p className="text-muted-foreground text-lg">No books found.</p>
-							<p className="text-muted-foreground/70 text-sm mt-2">Try adjusting your search terms.</p>
-						</CardContent>
-					</Card>
-				)}
+			<div className="md:hidden">
+				<div className="space-y-3 px-1">
+					{filteredRows?.length ? (
+						filteredRows.map((row) => (
+							<BookCard key={row.id} book={row.original} />
+						))
+					) : (
+						<Card className="bg-card/50 backdrop-blur-sm border-0 shadow-md">
+							<CardContent className="py-8 text-center">
+								<p className="text-muted-foreground text-base">No books found.</p>
+								<p className="text-muted-foreground/70 text-sm mt-1">Try adjusting your search terms.</p>
+							</CardContent>
+						</Card>
+					)}
+				</div>
 			</div>
 
 			{/* Desktop Table View */}
@@ -359,8 +362,8 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 						) : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center">
-									<p className="text-muted-foreground text-lg">No books found.</p>
-									<p className="text-muted-foreground/70 text-sm mt-2">Try adjusting your search terms.</p>
+									<p className="text-muted-foreground text-base">No books found.</p>
+									<p className="text-muted-foreground/70 text-sm mt-1">Try adjusting your search terms.</p>
 								</TableCell>
 							</TableRow>
 						)}
@@ -369,7 +372,7 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 			</div>
 
 			{/* Pagination */}
-			<div className="flex items-center justify-center space-x-3 py-4">
+			<div className="flex items-center justify-center gap-3 py-6 px-1">
 				<Button
 					variant="outline"
 					size="sm"
