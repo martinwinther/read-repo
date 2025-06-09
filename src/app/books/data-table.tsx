@@ -26,6 +26,10 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { BooksRefreshContext } from './columns'
+import { EmptyState } from '@/components/ui/empty-state'
+import { BookSearchSkeleton, InlineLoader } from '@/components/ui/loading-states'
+import { Search, BookOpen, Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 import {
 	DropdownMenu,
@@ -58,6 +62,7 @@ interface Book {
 interface DataTableProps<TData> {
 	columns: ColumnDef<TData>[]
 	data: TData[]
+	loading?: boolean
 }
 
 // Card component for mobile view
@@ -240,11 +245,12 @@ const globalFilterFn: FilterFn<Book> = (
 	return readFiltered !== false && otherWordsFiltered
 }
 
-export function DataTable({ columns, data }: DataTableProps<Book>) {
+export function DataTable({ columns, data, loading = false }: DataTableProps<Book>) {
 	const [sorting, setSorting] = React.useState<SortingState>([])
 	const [globalFilter, setGlobalFilter] = React.useState('')
 	const [columnVisibility, setColumnVisibility] =
 		React.useState<VisibilityState>({})
+	const router = useRouter()
 
 	const table = useReactTable({
 		data,
@@ -265,16 +271,22 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 
 	const filteredRows = table.getRowModel().rows
 
+	// Empty state for search results
+	const searchEmpty = globalFilter && filteredRows.length === 0
+
 	return (
 		<div className="w-full">
 			{/* Search and Controls */}
 			<div className="flex items-center gap-3 mb-6 px-1">
-				<Input
-					placeholder="Search books..."
-					value={globalFilter}
-					onChange={(event) => setGlobalFilter(event.target.value)}
-					className="flex-1 bg-background/80 backdrop-blur-sm"
-				/>
+				<div className="relative flex-1">
+					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						placeholder="Search books..."
+						value={globalFilter}
+						onChange={(event) => setGlobalFilter(event.target.value)}
+						className="pl-10 bg-background/80 backdrop-blur-sm"
+					/>
+				</div>
 				{/* Hide column selector on mobile since cards don't use it */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -306,100 +318,147 @@ export function DataTable({ columns, data }: DataTableProps<Book>) {
 			{/* Mobile Card View */}
 			<div className="md:hidden">
 				<div className="space-y-3 px-1">
-					{filteredRows?.length ? (
+					{loading ? (
+						<BookSearchSkeleton />
+					) : searchEmpty ? (
+						<EmptyState
+							icon={Search}
+							title="No books found"
+							description={`No books match "${globalFilter}". Try adjusting your search terms.`}
+							className="py-12"
+						/>
+					) : filteredRows?.length ? (
 						filteredRows.map((row) => (
 							<BookCard key={row.id} book={row.original} />
 						))
 					) : (
-						<Card className="bg-card/50 backdrop-blur-sm border-0 shadow-md">
-							<CardContent className="py-8 text-center">
-								<p className="text-muted-foreground text-base">No books found.</p>
-								<p className="text-muted-foreground/70 text-sm mt-1">Try adjusting your search terms.</p>
-							</CardContent>
-						</Card>
+						<EmptyState
+							icon={BookOpen}
+							title="No books yet"
+							description="Add your first book to get started with your library."
+							action={{
+								label: "Add a book",
+								onClick: () => router.push('/add')
+							}}
+							className="py-12"
+						/>
 					)}
 				</div>
 			</div>
 
 			{/* Desktop Table View */}
 			<div className="hidden md:block">
-				<Table>
-					<TableHeader>
-						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id} className="bg-muted/30 hover:bg-muted/40">
-								{headerGroup.headers.map((header) => {
-									return (
-										<TableHead key={header.id} className="text-center font-semibold">
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext()
-												  )}
-										</TableHead>
-									)
-								})}
-							</TableRow>
-						))}
-					</TableHeader>
-					<TableBody>
-						{filteredRows?.length ? (
-							filteredRows.map((row) => (
-								<TableRow
-									key={row.id}
-									className="text-center hover:bg-muted/20"
-									data-state={row.getIsSelected() && 'selected'}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext()
-											)}
-										</TableCell>
-									))}
+				<div className="rounded-lg border bg-card overflow-hidden">
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id} className="bg-muted/30 hover:bg-muted/40">
+									{headerGroup.headers.map((header) => {
+										return (
+											<TableHead key={header.id} className="text-center font-semibold">
+												{header.isPlaceholder
+													? null
+													: flexRender(
+															header.column.columnDef.header,
+															header.getContext()
+													  )}
+											</TableHead>
+										)
+									})}
 								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell colSpan={columns.length} className="h-24 text-center">
-									<p className="text-muted-foreground text-base">No books found.</p>
-									<p className="text-muted-foreground/70 text-sm mt-1">Try adjusting your search terms.</p>
-								</TableCell>
-							</TableRow>
-						)}
-					</TableBody>
-				</Table>
+							))}
+						</TableHeader>
+						<TableBody>
+							{loading ? (
+								// Loading skeleton rows
+								Array.from({ length: 5 }).map((_, i) => (
+									<TableRow key={i}>
+										{columns.map((_, j) => (
+											<TableCell key={j} className="text-center">
+												<div className="h-4 bg-muted/50 rounded animate-pulse" />
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : searchEmpty ? (
+								<TableRow>
+									<TableCell colSpan={columns.length} className="h-48">
+										<EmptyState
+											icon={Search}
+											title="No books found"
+											description={`No books match "${globalFilter}". Try adjusting your search terms.`}
+											className="py-8"
+										/>
+									</TableCell>
+								</TableRow>
+							) : filteredRows?.length ? (
+								filteredRows.map((row) => (
+									<TableRow
+										key={row.id}
+										className="text-center hover:bg-muted/20"
+										data-state={row.getIsSelected() && 'selected'}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext()
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell colSpan={columns.length} className="h-48">
+										<EmptyState
+											icon={BookOpen}
+											title="No books in your collection"
+											description="Start building your library by adding your first book."
+											action={{
+												label: "Add your first book",
+												onClick: () => router.push('/add')
+											}}
+											className="py-8"
+										/>
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				</div>
 			</div>
 
 			{/* Pagination */}
-			<div className="flex items-center justify-center gap-3 py-6 px-1">
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-					className="px-4">
-					Previous
-				</Button>
-				<div className="flex items-center gap-2 text-sm text-muted-foreground">
-					<span>Page</span>
-					<span className="font-medium text-foreground">
-						{table.getState().pagination.pageIndex + 1}
-					</span>
-					<span>of</span>
-					<span className="font-medium text-foreground">
-						{table.getPageCount()}
-					</span>
+			{!loading && filteredRows?.length > 0 && (
+				<div className="flex items-center justify-center gap-3 py-6 px-1">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+						className="px-4">
+						Previous
+					</Button>
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+						<span>Page</span>
+						<span className="font-medium text-foreground">
+							{table.getState().pagination.pageIndex + 1}
+						</span>
+						<span>of</span>
+						<span className="font-medium text-foreground">
+							{table.getPageCount()}
+						</span>
+					</div>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+						className="px-4">
+						Next
+					</Button>
 				</div>
-				<Button
-					variant="outline"
-					size="sm"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-					className="px-4">
-					Next
-				</Button>
-			</div>
+			)}
 		</div>
 	)
 }
