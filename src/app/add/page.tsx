@@ -153,8 +153,8 @@ export default function AddBook() {
 		}
 	}
 
-	function formatPublishedDate(dateString?: string): string | null {
-		if (!dateString) return null;
+	function formatPublishedDate(dateString?: string): string | undefined {
+		if (!dateString) return undefined;
 		
 		// Check if it's just a year
 		if (/^\d{4}$/.test(dateString)) {
@@ -171,8 +171,8 @@ export default function AddBook() {
 			return dateString;
 		}
 		
-		// Return null for invalid formats
-		return null;
+		// Return undefined for invalid formats
+		return undefined;
 	}
 
 	if (isLoading) {
