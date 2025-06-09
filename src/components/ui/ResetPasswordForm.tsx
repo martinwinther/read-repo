@@ -58,7 +58,7 @@ export function ResetPasswordForm({ onViewChange }: ResetPasswordFormProps) {
 
 			setSuccess(true)
 		} catch (error: any) {
-			setError(error.message || 'An error occurred while sending the reset email')
+			setError(error.message || '&apos;An error occurred while sending the reset email')
 		} finally {
 			setLoading(false)
 		}
