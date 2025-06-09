@@ -249,7 +249,13 @@ export function DataTable({ columns, data, loading = false }: DataTableProps<Boo
 	const [sorting, setSorting] = React.useState<SortingState>([])
 	const [globalFilter, setGlobalFilter] = React.useState('')
 	const [columnVisibility, setColumnVisibility] =
-		React.useState<VisibilityState>({})
+		React.useState<VisibilityState>({
+			// Hide less important columns by default to save space
+			purchased_date: false,
+			purchase_location: false,
+			reader: false,
+			isbn: false,
+		})
 	const router = useRouter()
 
 	const table = useReactTable({
@@ -349,7 +355,8 @@ export function DataTable({ columns, data, loading = false }: DataTableProps<Boo
 			{/* Desktop Table View */}
 			<div className="hidden md:block">
 				<div className="rounded-lg border bg-card overflow-hidden">
-					<Table>
+					<div className="overflow-x-auto">
+						<Table className="table-fixed min-w-full">
 						<TableHeader>
 							{table.getHeaderGroups().map((headerGroup) => (
 								<TableRow key={headerGroup.id} className="bg-muted/30 hover:bg-muted/40">
@@ -424,7 +431,8 @@ export function DataTable({ columns, data, loading = false }: DataTableProps<Boo
 								</TableRow>
 							)}
 						</TableBody>
-					</Table>
+						</Table>
+					</div>
 				</div>
 			</div>
 

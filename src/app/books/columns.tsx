@@ -116,6 +116,14 @@ export const columns: ColumnDef<Book>[] = [
 				</Button>
 			)
 		},
+		cell: ({ row }) => {
+			return (
+				<div className="max-w-[200px] truncate font-medium" title={row.original.title}>
+					{row.original.title}
+				</div>
+			)
+		},
+		size: 250,
 	},
 	{
 		accessorKey: 'author',
@@ -130,72 +138,14 @@ export const columns: ColumnDef<Book>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			return <div>{row.original.author || <span className="text-gray-400">Unknown author</span>}</div>
-		}
-	},
-	{
-		accessorKey: 'isbn',
-		header: ({ column }) => {
+			const author = row.original.author || 'Unknown author'
 			return (
-				<Button
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-					ISBN
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</Button>
+				<div className="max-w-[150px] truncate" title={author}>
+					{author}
+				</div>
 			)
 		},
-		cell: ({ row }) => {
-			return <div>{row.original.isbn || <span className="text-gray-400">No ISBN</span>}</div>
-		}
-	},
-	{
-		accessorKey: 'published_date',
-		header: ({ column }) => {
-			return (
-				<Button
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-					Published
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</Button>
-			)
-		},
-		cell: ({ row }) => {
-			return <div>{row.original.published_date || <span className="text-gray-400">Unknown date</span>}</div>
-		}
-	},
-	{
-		accessorKey: 'purchased_date',
-		header: ({ column }) => {
-			return (
-				<Button
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-					Purchased
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</Button>
-			)
-		},
-		cell: ({ row }) => {
-			return <div>{row.original.purchased_date || <span className="text-gray-400">Not recorded</span>}</div>
-		}
-	},
-	{
-		accessorKey: 'purchase_location',
-		header: ({ column }) => {
-			return (
-				<Button
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-					Purchased at
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</Button>
-			)
-		},
-		cell: ({ row }) => {
-			return <div>{row.original.purchase_location || <span className="text-gray-400">Unknown location</span>}</div>
-		}
+		size: 180,
 	},
 	{
 		accessorKey: 'read',
@@ -210,24 +160,17 @@ export const columns: ColumnDef<Book>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			return <div>{row.original.read ? 'Yes' : 'No'}</div>
-		}
-	},
-	{
-		accessorKey: 'reader',
-		header: ({ column }) => {
 			return (
-				<Button
-					variant="ghost"
-					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-					Reader
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</Button>
+				<div className="flex justify-center">
+					{row.original.read ? (
+						<span className="text-green-600 font-medium">✓ Yes</span>
+					) : (
+						<span className="text-muted-foreground">No</span>
+					)}
+				</div>
 			)
 		},
-		cell: ({ row }) => {
-			return <div>{row.original.reader || <span className="text-gray-400">No reader</span>}</div>
-		}
+		size: 80,
 	},
 	{
 		accessorKey: 'location',
@@ -242,8 +185,131 @@ export const columns: ColumnDef<Book>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			return <div>{row.original.location || <span className="text-gray-400">Not shelved</span>}</div>
-		}
+			const location = row.original.location || 'Not shelved'
+			return (
+				<div className="max-w-[120px] truncate" title={location}>
+					{location}
+				</div>
+			)
+		},
+		size: 140,
+	},
+	{
+		accessorKey: 'published_date',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Published
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
+		cell: ({ row }) => {
+			const date = row.original.published_date
+			return (
+				<div className="text-sm">
+					{date ? new Date(date).getFullYear() : 'Unknown'}
+				</div>
+			)
+		},
+		size: 100,
+		enableHiding: true,
+	},
+	{
+		accessorKey: 'isbn',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					ISBN
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
+		cell: ({ row }) => {
+			const isbn = row.original.isbn
+			return isbn ? (
+				<div className="text-xs font-mono max-w-[100px] truncate" title={isbn}>
+					{isbn}
+				</div>
+			) : (
+				<span className="text-muted-foreground text-xs">No ISBN</span>
+			)
+		},
+		size: 120,
+		enableHiding: true,
+	},
+	{
+		accessorKey: 'purchased_date',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Purchased
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
+		cell: ({ row }) => {
+			const date = row.original.purchased_date
+			return (
+				<div className="text-sm">
+					{date || <span className="text-muted-foreground">Not recorded</span>}
+				</div>
+			)
+		},
+		size: 110,
+		enableHiding: true,
+	},
+	{
+		accessorKey: 'purchase_location',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Purchased at
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
+		cell: ({ row }) => {
+			const location = row.original.purchase_location || 'Unknown'
+			return (
+				<div className="max-w-[120px] truncate text-sm" title={location}>
+					{location}
+				</div>
+			)
+		},
+		size: 140,
+		enableHiding: true,
+	},
+	{
+		accessorKey: 'reader',
+		header: ({ column }) => {
+			return (
+				<Button
+					variant="ghost"
+					onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+					Reader
+					<ArrowUpDown className="ml-2 h-4 w-4" />
+				</Button>
+			)
+		},
+		cell: ({ row }) => {
+			const reader = row.original.reader || 'No reader'
+			return (
+				<div className="max-w-[100px] truncate text-sm" title={reader}>
+					{reader}
+				</div>
+			)
+		},
+		size: 120,
+		enableHiding: true,
 	},
 	{
 		id: 'actions',
@@ -252,6 +318,8 @@ export const columns: ColumnDef<Book>[] = [
 			const book = row.original;
 			return <ActionsCellWrapper book={book} />;
 		},
+		size: 80,
+		enableHiding: false,
 	},
 ]
 
