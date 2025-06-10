@@ -114,16 +114,28 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
     try {
       setIsLoading(true)
       const rooms = await getRootLocations()
-      setRoomOptions(rooms)
+      if (rooms && rooms.length > 0) {
+        setRoomOptions(rooms)
+      } else {
+        // No rooms found, use defaults
+        setRoomOptions([
+          { id: 'temp-1', name: 'Living Room', parent_id: null, preset: true, user_id: '', deleted_at: undefined },
+          { id: 'temp-2', name: 'Bedroom', parent_id: null, preset: true, user_id: '', deleted_at: undefined },
+          { id: 'temp-3', name: 'Home Office', parent_id: null, preset: true, user_id: '', deleted_at: undefined },
+          { id: 'temp-4', name: 'Study', parent_id: null, preset: true, user_id: '', deleted_at: undefined }
+        ])
+        toast.info('Using default room options - you can create custom locations')
+      }
     } catch (error) {
       console.error('Error loading rooms:', error)
       // Provide default options if database setup is not complete
       setRoomOptions([
         { id: 'temp-1', name: 'Living Room', parent_id: null, preset: true, user_id: '', deleted_at: undefined },
         { id: 'temp-2', name: 'Bedroom', parent_id: null, preset: true, user_id: '', deleted_at: undefined },
-        { id: 'temp-3', name: 'Office', parent_id: null, preset: true, user_id: '', deleted_at: undefined }
+        { id: 'temp-3', name: 'Home Office', parent_id: null, preset: true, user_id: '', deleted_at: undefined },
+        { id: 'temp-4', name: 'Study', parent_id: null, preset: true, user_id: '', deleted_at: undefined }
       ])
-      toast.error('Location system not fully set up - using temporary options')
+      toast.warning('Location system not fully set up - using temporary options')
     } finally {
       setIsLoading(false)
     }
@@ -133,7 +145,42 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
     try {
       setIsLoading(true)
       const locations = await getChildLocations(roomId)
-      setLocationOptions(locations)
+      if (locations && locations.length > 0) {
+        setLocationOptions(locations)
+      } else {
+        // Provide common default locations based on room type
+        const room = roomOptions.find(r => r.id === roomId)
+        const roomName = room?.name.toLowerCase() || ''
+        
+        let defaultLocations: any[] = []
+        
+        if (roomName.includes('living')) {
+          defaultLocations = [
+            { id: `${roomId}-1`, name: 'Bookshelf', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-2`, name: 'Coffee Table', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-3`, name: 'Side Table', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        } else if (roomName.includes('bedroom')) {
+          defaultLocations = [
+            { id: `${roomId}-1`, name: 'Nightstand', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-2`, name: 'Dresser', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-3`, name: 'Bookshelf', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        } else if (roomName.includes('office') || roomName.includes('study')) {
+          defaultLocations = [
+            { id: `${roomId}-1`, name: 'Bookshelf', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-2`, name: 'Desk', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-3`, name: 'Filing Cabinet', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        } else {
+          defaultLocations = [
+            { id: `${roomId}-1`, name: 'Shelf', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${roomId}-2`, name: 'Table', parent_id: roomId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        }
+        
+        setLocationOptions(defaultLocations)
+      }
     } catch (error) {
       console.error('Error loading locations:', error)
       // Set empty for now, user can create custom locations
@@ -147,7 +194,36 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
     try {
       setIsLoading(true)
       const sublocations = await getChildLocations(locationId)
-      setSublocationOptions(sublocations)
+      if (sublocations && sublocations.length > 0) {
+        setSublocationOptions(sublocations)
+      } else {
+        // Provide common default sublocations based on location type
+        const location = locationOptions.find(l => l.id === locationId)
+        const locationName = location?.name.toLowerCase() || ''
+        
+        let defaultSublocations: any[] = []
+        
+        if (locationName.includes('bookshelf') || locationName.includes('shelf')) {
+          defaultSublocations = [
+            { id: `${locationId}-1`, name: 'Top Shelf', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${locationId}-2`, name: 'Middle Shelf', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${locationId}-3`, name: 'Bottom Shelf', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        } else if (locationName.includes('desk')) {
+          defaultSublocations = [
+            { id: `${locationId}-1`, name: 'Drawer', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${locationId}-2`, name: 'Desktop', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        } else if (locationName.includes('table')) {
+          defaultSublocations = [
+            { id: `${locationId}-1`, name: 'On Top', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined },
+            { id: `${locationId}-2`, name: 'Underneath', parent_id: locationId, preset: true, user_id: '', deleted_at: undefined }
+          ]
+        }
+        // For other locations, we can leave empty (no sublocation required)
+        
+        setSublocationOptions(defaultSublocations)
+      }
     } catch (error) {
       console.error('Error loading sublocations:', error)
       // Set empty for now, user can create custom locations
@@ -167,18 +243,19 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
     setSelectedLocation(location)
     await loadSublocationOptions(location.id)
     
-    // If no sublocations, this can be the final selection
-    if (sublocationOptions.length === 0) {
-      const path = await getLocationPath(location.id)
-      onSelect(location.id, path)
-    } else {
-      setStep('sublocation')
-    }
+    // Always go to sublocation step first, let user decide
+    setStep('sublocation')
   }
 
   const handleSublocationSelect = async (sublocation: Location) => {
-    const path = await getLocationPath(sublocation.id)
-    onSelect(sublocation.id, path)
+    // Build path manually for temporary locations
+    if (sublocation.id.startsWith('temp-')) {
+      const path = `${selectedRoom?.name} › ${selectedLocation?.name} › ${sublocation.name}`
+      onSelect(sublocation.id, path)
+    } else {
+      const path = await getLocationPath(sublocation.id)
+      onSelect(sublocation.id, path)
+    }
   }
 
   const handleCustomInputChange = async (value: string) => {
@@ -209,6 +286,22 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
                      step === 'location' ? selectedRoom?.id :
                      selectedLocation?.id
 
+      // Check if parent is temporary, if so create a temporary path
+      if (parentId && parentId.startsWith('temp-')) {
+        const tempId = `temp-${Date.now()}`
+        let fallbackPath = customInput.trim()
+        
+        if (step === 'location' && selectedRoom) {
+          fallbackPath = `${selectedRoom.name} › ${customInput.trim()}`
+        } else if (step === 'sublocation' && selectedRoom && selectedLocation) {
+          fallbackPath = `${selectedRoom.name} › ${selectedLocation.name} › ${customInput.trim()}`
+        }
+        
+        onSelect(tempId, fallbackPath)
+        toast.info(`Created temporary location: ${fallbackPath}`)
+        return
+      }
+
       const newLocation = await createLocation(customInput.trim(), parentId || null)
       const path = await getLocationPath(newLocation.id)
       
@@ -218,7 +311,14 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
       console.error('Error creating location:', error)
       // Fallback: use the custom input as legacy location
       const tempId = `temp-${Date.now()}`
-      const fallbackPath = customInput.trim()
+      let fallbackPath = customInput.trim()
+      
+      if (step === 'location' && selectedRoom) {
+        fallbackPath = `${selectedRoom.name} › ${customInput.trim()}`
+      } else if (step === 'sublocation' && selectedRoom && selectedLocation) {
+        fallbackPath = `${selectedRoom.name} › ${selectedLocation.name} › ${customInput.trim()}`
+      }
+      
       onSelect(tempId, fallbackPath)
       toast.warning(`Using temporary location: ${fallbackPath}`)
     } finally {
@@ -297,6 +397,40 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
         
         {/* Existing options */}
         <div className="grid gap-2 mt-2 max-h-48 overflow-y-auto">
+          {/* Option to select parent location */}
+          {step === 'location' && selectedRoom && (
+            <Button
+              variant="default"
+              className="justify-start h-auto p-3 border-primary"
+              onClick={async () => {
+                const path = selectedRoom.name
+                onSelect(selectedRoom.id, path)
+              }}
+            >
+              <div className="text-left">
+                <div className="font-medium">📍 Use "{selectedRoom.name}"</div>
+                <div className="text-xs text-muted-foreground">Select just the room</div>
+              </div>
+            </Button>
+          )}
+          
+          {/* Option to select parent location when viewing sublocations */}
+          {step === 'sublocation' && selectedLocation && (
+            <Button
+              variant="default"
+              className="justify-start h-auto p-3 border-primary"
+              onClick={async () => {
+                const path = `${selectedRoom?.name} › ${selectedLocation.name}`
+                onSelect(selectedLocation.id, path)
+              }}
+            >
+              <div className="text-left">
+                <div className="font-medium">📍 Use "{selectedLocation.name}"</div>
+                <div className="text-xs text-muted-foreground">Select this location without going deeper</div>
+              </div>
+            </Button>
+          )}
+          
           {getCurrentOptions().map((option) => (
             <Button
               key={option.id}

@@ -34,7 +34,7 @@ export async function getUserBooks() {
   return data as Book[];
 }
 
-// Add a new book with retry logic
+// Add a new book
 export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
   const supabase = createClientComponentClient();
   
@@ -48,6 +48,14 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
   // Format the ISBN if provided
   const formattedIsbn = formatIsbn(book.isbn);
   
+  let finalLocationId: string | undefined = book.location_id;
+  
+  // If location_id is temporary, fall back to legacy location field
+  if (book.location_id && book.location_id.startsWith('temp-')) {
+    finalLocationId = undefined;
+    console.log('Temporary location detected, using legacy location field');
+  }
+  
   // Base book data
   const bookData = {
     title: book.title,
@@ -55,47 +63,36 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
     author: book.author,
     published_date: book.published_date,
     read: book.read || false,
-    location: book.location, // legacy field
-    location_id: book.location_id, // new hierarchical location
+    location: book.location, // legacy field - will be used for temp locations
+    location_id: finalLocationId, // new hierarchical location (exclude temp IDs)
     user_id: user.id
   };
   
-  // Try using the .insert() method without an ID first
-  let result = await supabase
+  console.log('Attempting to insert book:', bookData);
+  
+  // Insert the book
+  const { data, error } = await supabase
     .from('books')
     .insert(bookData)
     .select()
     .single();
   
-  // If we still get a duplicate key error, use a different approach
-  if (result.error && result.error.code === '23505') {
-    console.log('Trying alternative insertion method...');
+  if (error) {
+    console.error('Error adding book:', error);
     
-    // Use raw SQL to insert with a generated ID
-    const { data, error } = await supabase.rpc('add_book_with_generated_id', {
-      p_title: book.title,
-      p_isbn: formattedIsbn,
-      p_author: book.author,
-      p_published_date: book.published_date,
-      p_read: book.read || false,
-      p_location: book.location,
-      p_user_id: user.id
-    });
-    
-    if (error) {
-      console.error('Error adding book with generated ID:', error);
-      throw error;
+    // Provide more helpful error messages
+    if (error.code === '23505') {
+      throw new Error('A book with this ISBN already exists in your collection');
+    } else if (error.code === '23502') {
+      throw new Error('Missing required book information');
+    } else if (error.code === '22P02') {
+      throw new Error('Invalid data format');
+    } else {
+      throw new Error(`Failed to add book: ${error.message}`);
     }
-    
-    return data as Book;
   }
   
-  if (result.error) {
-    console.error('Error adding book:', result.error);
-    throw result.error;
-  }
-  
-  return result.data as Book;
+  return data as Book;
 }
 
 // Update a book

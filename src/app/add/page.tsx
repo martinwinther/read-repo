@@ -116,6 +116,7 @@ export default function AddBook() {
 				isbn: selectedBook.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
 				published_date: formatPublishedDate(selectedBook.volumeInfo.publishedDate),
 				location_id: selectedLocationId,
+				location: selectedLocationId.startsWith('temp-') ? selectedLocationPath : undefined, // Use path for temp locations
 				read: false,
 			}
 

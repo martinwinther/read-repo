@@ -88,6 +88,11 @@ export async function getRootLocations(): Promise<Location[]> {
  * Get child locations for a parent
  */
 export async function getChildLocations(parentId: string): Promise<Location[]> {
+  // Handle temporary location IDs - they don't have children in the database
+  if (parentId.startsWith('temp-')) {
+    return []
+  }
+
   const supabase = createClientComponentClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -117,6 +122,11 @@ export async function createLocation(
   parentId: string | null = null, 
   preset: boolean = false
 ): Promise<Location> {
+  // Handle temporary location IDs - they can't be used as parent IDs in the database
+  if (parentId && parentId.startsWith('temp-')) {
+    throw new Error('Cannot create location with temporary parent ID')
+  }
+
   const supabase = createClientComponentClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -266,6 +276,11 @@ export async function findSimilarLocations(
   candidate: string, 
   parentId: string | null = null
 ): Promise<Array<Location & { similarity: number }>> {
+  // Handle temporary location IDs - they don't have children in the database
+  if (parentId && parentId.startsWith('temp-')) {
+    return []
+  }
+
   const supabase = createClientComponentClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -294,6 +309,11 @@ export async function findSimilarLocations(
  * Get the full path for a location
  */
 export async function getLocationPath(locationId: string): Promise<string> {
+  // Handle temporary location IDs
+  if (locationId.startsWith('temp-')) {
+    return 'Temporary Location'
+  }
+
   const supabase = createClientComponentClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -389,6 +409,10 @@ export async function getBookLocationDisplay(book: { location?: string; location
   // If the book has a hierarchical location_id, use that
   if (book.location_id) {
     try {
+      // Handle temporary location IDs
+      if (book.location_id.startsWith('temp-')) {
+        return book.location || 'Temporary Location'
+      }
       return await getLocationPath(book.location_id)
     } catch (error) {
       console.error('Error getting location path:', error)

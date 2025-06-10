@@ -12,60 +12,88 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Step 1: Create the locations table (if it doesn't exist)
-    const createTableSQL = `
-      CREATE TABLE IF NOT EXISTS locations (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        parent_id UUID REFERENCES locations(id) ON DELETE RESTRICT,
-        name TEXT NOT NULL,
-        preset BOOLEAN NOT NULL DEFAULT false,
-        deleted_at TIMESTAMPTZ,
-        user_id UUID NOT NULL,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `
+    console.log('Setting up location system for user:', user.id)
 
-    const { error: tableError } = await supabase.rpc('exec_sql', { sql: createTableSQL })
-    if (tableError) {
-      console.error('Error creating locations table:', tableError)
-      return NextResponse.json({ error: 'Failed to create locations table' }, { status: 500 })
+    // Check if locations table exists by trying to query it
+    let tableExists = false
+    try {
+      const { error } = await supabase
+        .from('locations')
+        .select('id')
+        .limit(1)
+      
+      tableExists = !error
+    } catch (e) {
+      tableExists = false
     }
 
-    // Step 2: Create indexes
-    const indexSQL = `
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_locations_parent_name 
-        ON locations(parent_id, user_id, lower(name)) WHERE deleted_at IS NULL;
-      CREATE INDEX IF NOT EXISTS idx_locations_parent ON locations(parent_id);
-      CREATE INDEX IF NOT EXISTS idx_locations_preset ON locations(preset);
-      CREATE INDEX IF NOT EXISTS idx_locations_user ON locations(user_id);
-    `
-
-    const { error: indexError } = await supabase.rpc('exec_sql', { sql: indexSQL })
-    if (indexError) {
-      console.error('Error creating indexes:', indexError)
-      return NextResponse.json({ error: 'Failed to create indexes' }, { status: 500 })
+    if (!tableExists) {
+      console.log('Locations table does not exist - manual database setup required')
+      return NextResponse.json({ 
+        error: 'Database setup required',
+        message: 'Please run the setup-database.sql script in your Supabase dashboard first'
+      }, { status: 400 })
     }
 
-    // Step 3: Add location_id column to books table (if it doesn't exist)
-    const alterBooksSQL = `
-      ALTER TABLE books 
-      ADD COLUMN IF NOT EXISTS location_id UUID 
-      REFERENCES locations(id) ON DELETE SET NULL;
-    `
-
-    const { error: alterError } = await supabase.rpc('exec_sql', { sql: alterBooksSQL })
-    if (alterError) {
-      console.error('Error altering books table:', alterError)
-      return NextResponse.json({ error: 'Failed to alter books table' }, { status: 500 })
+    // Check if location_id column exists in books table
+    let locationColumnExists = false
+    try {
+      const { data: books } = await supabase
+        .from('books')
+        .select('location_id')
+        .limit(1)
+      
+      locationColumnExists = true
+    } catch (e) {
+      locationColumnExists = false
     }
 
-    // Step 4: Migrate existing location data for this user
+    if (!locationColumnExists) {
+      console.log('location_id column does not exist in books table')
+      return NextResponse.json({ 
+        error: 'Books table not updated',
+        message: 'Please run the setup-database.sql script to add location_id column'
+      }, { status: 400 })
+    }
+
+    // Check if user already has locations set up
+    const { data: existingLocations } = await supabase
+      .from('locations')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1)
+
+    let setupMessage = ''
+
+    // Create preset locations if user doesn't have any
+    if (!existingLocations || existingLocations.length === 0) {
+      console.log('Creating preset locations for user')
+      
+      // Call the preset creation function
+      const { error: presetError } = await supabase.rpc('create_preset_locations_for_user', {
+        user_uuid: user.id
+      })
+
+      if (presetError) {
+        console.error('Error creating preset locations:', presetError)
+        return NextResponse.json({ 
+          error: 'Failed to create preset locations',
+          details: presetError.message
+        }, { status: 500 })
+      }
+
+      setupMessage += 'Preset locations created. '
+    } else {
+      setupMessage += 'Preset locations already exist. '
+    }
+
+    // Migrate existing location data for this user
     const { data: userBooks, error: booksError } = await supabase
       .from('books')
       .select('id, location')
       .eq('user_id', user.id)
       .not('location', 'is', null)
+      .is('location_id', null) // Only migrate books that haven't been migrated yet
 
     if (booksError) {
       console.error('Error fetching user books:', booksError)
@@ -74,46 +102,81 @@ export async function POST() {
 
     let migratedCount = 0
     if (userBooks && userBooks.length > 0) {
-      // Create a "Legacy Locations" root for this user
-      const { data: legacyRoot, error: rootError } = await supabase
+      console.log(`Migrating ${userBooks.length} books with legacy locations`)
+
+      // Check if "Legacy Locations" root already exists
+      let { data: legacyRoot } = await supabase
         .from('locations')
-        .insert({
-          name: 'Legacy Locations',
-          preset: false,
-          user_id: user.id
-        })
-        .select()
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('name', 'Legacy Locations')
+        .is('parent_id', null)
         .single()
 
-      if (rootError || !legacyRoot) {
-        console.error('Error creating legacy root:', rootError)
-        return NextResponse.json({ error: 'Failed to create legacy root' }, { status: 500 })
+      // Create "Legacy Locations" root if it doesn't exist
+      if (!legacyRoot) {
+        const { data: newLegacyRoot, error: rootError } = await supabase
+          .from('locations')
+          .insert({
+            name: 'Legacy Locations',
+            preset: false,
+            user_id: user.id
+          })
+          .select()
+          .single()
+
+        if (rootError || !newLegacyRoot) {
+          console.error('Error creating legacy root:', rootError)
+          return NextResponse.json({ error: 'Failed to create legacy root' }, { status: 500 })
+        }
+
+        legacyRoot = newLegacyRoot
+      }
+
+      if (!legacyRoot) {
+        console.error('Failed to get or create legacy root location')
+        return NextResponse.json({ error: 'Failed to setup legacy locations' }, { status: 500 })
       }
 
       // Get unique locations for this user
       const uniqueLocations = Array.from(new Set(userBooks.map(book => book.location).filter(Boolean)))
       
-      // Create location entries for each unique location
-      const locationInserts = uniqueLocations.map(location => ({
-        name: location,
-        parent_id: legacyRoot.id,
-        preset: false,
-        user_id: user.id
-      }))
-
-      const { data: createdLocations, error: locationError } = await supabase
+      // Get existing legacy locations to avoid duplicates
+      const { data: existingLegacyLocations } = await supabase
         .from('locations')
-        .insert(locationInserts)
-        .select()
+        .select('id, name')
+        .eq('parent_id', legacyRoot.id)
+        .eq('user_id', user.id)
 
-      if (locationError || !createdLocations) {
-        console.error('Error creating locations:', locationError)
-        return NextResponse.json({ error: 'Failed to create locations' }, { status: 500 })
+      const existingLocationNames = new Set(existingLegacyLocations?.map(loc => loc.name) || [])
+      
+      // Create location entries for new unique locations
+      const newLocationNames = uniqueLocations.filter(name => !existingLocationNames.has(name))
+      
+      if (newLocationNames.length > 0) {
+        const locationInserts = newLocationNames.map(location => ({
+          name: location,
+          parent_id: legacyRoot.id,
+          preset: false,
+          user_id: user.id
+        }))
+
+        const { data: createdLocations, error: locationError } = await supabase
+          .from('locations')
+          .insert(locationInserts)
+          .select()
+
+        if (locationError) {
+          console.error('Error creating locations:', locationError)
+          return NextResponse.json({ error: 'Failed to create locations' }, { status: 500 })
+        }
+
+        existingLegacyLocations?.push(...(createdLocations || []))
       }
 
       // Create a map of location name to location id
       const locationMap = new Map(
-        createdLocations.map(loc => [loc.name, loc.id])
+        existingLegacyLocations?.map(loc => [loc.name, loc.id]) || []
       )
 
       // Update books with location_id
@@ -132,22 +195,17 @@ export async function POST() {
           }
         }
       }
-    }
 
-    // Step 5: Create index for books.location_id
-    const bookIndexSQL = `
-      CREATE INDEX IF NOT EXISTS idx_books_location_id ON books(location_id);
-    `
-
-    const { error: bookIndexError } = await supabase.rpc('exec_sql', { sql: bookIndexSQL })
-    if (bookIndexError) {
-      console.error('Error creating book index:', bookIndexError)
+      setupMessage += `Migrated ${migratedCount} books to hierarchical locations.`
+    } else {
+      setupMessage += 'No legacy books to migrate.'
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: `Locations system set up successfully. Migrated ${migratedCount} books.`,
-      migratedCount
+      message: setupMessage,
+      migratedCount,
+      user_id: user.id
     })
 
   } catch (error) {
