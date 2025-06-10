@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { fetchBooks, Book as GoogleBook } from '@/lib/utils'
 import { BookSearchSkeleton, InlineLoader, LoadingSpinner } from '@/components/ui/loading-states'
 import { EmptyState } from '@/components/ui/empty-state'
+import { LocationSelector } from '@/components/ui/location-selector'
 import { Search, BookOpen, AlertCircle } from 'lucide-react'
 import {
 	Dialog,
@@ -16,13 +17,7 @@ import {
 	DialogTitle,
 	DialogDescription,
 } from '@/components/ui/dialog'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
+
 import { toast, Toaster } from 'sonner'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
@@ -56,13 +51,8 @@ export default function AddBook() {
 	const [selectedBook, setSelectedBook] = useState<GoogleBook | null>(null)
 	const [openDetailsDialog, setOpenDetailsDialog] = useState<boolean>(false)
 	const [detailsBook, setDetailsBook] = useState<GoogleBook | null>(null)
-	const [locations, setLocations] = useState<string[]>([
-		'Living Room',
-		'Bedroom',
-		'Office',
-	])
-	const [newLocation, setNewLocation] = useState<string>('')
-	const [selectedLocation, setSelectedLocation] = useState<string>('')
+	const [selectedLocationId, setSelectedLocationId] = useState<string>('')
+	const [selectedLocationPath, setSelectedLocationPath] = useState<string>('')
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 	const [isSearching, setIsSearching] = useState<boolean>(false)
 	const [searchError, setSearchError] = useState<string | null>(null)
@@ -112,9 +102,8 @@ export default function AddBook() {
 	const handleConfirm = async () => {
 		if (!selectedBook) return
 		
-		const finalLocation = newLocation.trim() || selectedLocation
-		if (!finalLocation) {
-			toast.error('Please select or enter a location')
+		if (!selectedLocationId) {
+			toast.error('Please select a location')
 			return
 		}
 
@@ -126,7 +115,7 @@ export default function AddBook() {
 				author: selectedBook.volumeInfo.authors?.[0] || '',
 				isbn: selectedBook.volumeInfo.industryIdentifiers?.[0]?.identifier || '',
 				published_date: formatPublishedDate(selectedBook.volumeInfo.publishedDate),
-				location: finalLocation,
+				location_id: selectedLocationId,
 				read: false,
 			}
 
@@ -134,14 +123,10 @@ export default function AddBook() {
 			
 			toast.success(`"${selectedBook.volumeInfo.title}" added successfully!`)
 			
-			if (newLocation.trim() && !locations.includes(newLocation.trim())) {
-				setLocations([...locations, newLocation.trim()])
-			}
-			
 			setOpenDialog(false)
 			setSelectedBook(null)
-			setNewLocation('')
-			setSelectedLocation('')
+			setSelectedLocationId('')
+			setSelectedLocationPath('')
 			
 			// Redirect to books page
 			router.push('/books')
@@ -310,24 +295,19 @@ export default function AddBook() {
 						</div>
 					)}
 					<div className="space-y-4">
-						<Select onValueChange={setSelectedLocation} value={selectedLocation}>
-							<SelectTrigger className="w-full">
-								<SelectValue placeholder="Select a location" />
-							</SelectTrigger>
-							<SelectContent>
-								{locations.map((location, index) => (
-									<SelectItem key={index} value={location}>
-										{location}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						<Input
-							type="text"
-							placeholder="Or add a new location"
-							value={newLocation}
-							onChange={(e) => setNewLocation(e.target.value)}
+						<LocationSelector
+							value={selectedLocationId}
+							onChange={(locationId, locationPath) => {
+								setSelectedLocationId(locationId)
+								setSelectedLocationPath(locationPath)
+							}}
+							placeholder="Choose where this book is located"
 						/>
+						{selectedLocationPath && (
+							<p className="text-sm text-muted-foreground">
+								Selected: <span className="font-medium">{selectedLocationPath}</span>
+							</p>
+						)}
 					</div>
 					<DialogFooter>
 						<Button variant="outline" onClick={() => setOpenDialog(false)} disabled={isSubmitting}>

@@ -13,9 +13,30 @@ import {
 import { deleteBook } from '@/lib/booksService'
 import { toast } from 'sonner'
 import { EditBookDialog } from './EditBookDialog'
+import { getBookLocationDisplay } from '@/lib/locationService'
 
 // Create a context for refresh functionality
 export const BooksRefreshContext = React.createContext<() => void>(() => {});
+
+// Component for displaying book location (handles both legacy and hierarchical)
+const LocationCell = ({ book }: { book: Book }) => {
+	const [locationText, setLocationText] = React.useState<string>('Loading...')
+
+	React.useEffect(() => {
+		getBookLocationDisplay(book)
+			.then(setLocationText)
+			.catch(() => {
+				// Fallback to legacy location or default text
+				setLocationText(book.location || 'Not shelved')
+			})
+	}, [book.location, book.location_id])
+
+	return (
+		<div className="max-w-[120px] truncate" title={locationText}>
+			{locationText}
+		</div>
+	)
+}
 
 interface Book {
 	id: number
@@ -27,7 +48,8 @@ interface Book {
 	purchase_location?: string
 	read: boolean
 	reader?: string
-	location?: string
+	location?: string // legacy field
+	location_id?: string // new hierarchical location
 	user_id: string
 }
 
@@ -185,12 +207,7 @@ export const columns: ColumnDef<Book>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			const location = row.original.location || 'Not shelved'
-			return (
-				<div className="max-w-[120px] truncate" title={location}>
-					{location}
-				</div>
-			)
+			return <LocationCell book={row.original} />
 		},
 		size: 140,
 	},

@@ -44,6 +44,23 @@ import { MoreHorizontal } from 'lucide-react'
 import { deleteBook } from '@/lib/booksService'
 import { toast } from 'sonner'
 import { EditBookDialog } from './EditBookDialog'
+import { getBookLocationDisplay } from '@/lib/locationService'
+
+// Hook for getting book location display text
+function useBookLocation(book: { location?: string; location_id?: string }) {
+	const [locationText, setLocationText] = React.useState<string>('Loading...')
+
+	React.useEffect(() => {
+		getBookLocationDisplay(book)
+			.then(setLocationText)
+			.catch(() => {
+				// Fallback to legacy location or default text
+				setLocationText(book.location || 'Not shelved')
+			})
+	}, [book.location, book.location_id])
+
+	return locationText
+}
 
 interface Book {
 	id: number
@@ -55,7 +72,8 @@ interface Book {
 	purchase_location?: string
 	read: boolean
 	reader?: string
-	location?: string
+	location?: string // legacy field
+	location_id?: string // new hierarchical location
 	user_id: string
 }
 
@@ -70,6 +88,7 @@ function BookCard({ book }: { book: Book }) {
 	const [editDialogOpen, setEditDialogOpen] = React.useState(false)
 	const [showDetails, setShowDetails] = React.useState(false)
 	const refreshBooks = React.useContext(BooksRefreshContext)
+	const locationText = useBookLocation(book)
 
 	const handleDelete = async () => {
 		if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
@@ -143,9 +162,9 @@ function BookCard({ book }: { book: Book }) {
 						>
 							{book.read ? "Read" : "Unread"}
 						</Badge>
-						{book.location && (
+						{locationText !== 'Not shelved' && (
 							<Badge variant="outline" className="rounded-full px-2.5 py-0.5 text-xs">
-								{book.location}
+								{locationText}
 							</Badge>
 						)}
 						{book.reader && book.reader !== book.author && (

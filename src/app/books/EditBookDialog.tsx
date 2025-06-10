@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { updateBook } from '@/lib/booksService'
 import { toast } from 'sonner'
 import { formatIsbn } from '@/lib/utils'
+import { LocationSelector } from '@/components/ui/location-selector'
 
 interface Book {
   id: number
@@ -20,7 +21,8 @@ interface Book {
   purchase_location?: string
   read: boolean
   reader?: string
-  location?: string
+  location?: string // legacy field
+  location_id?: string // new hierarchical location
   user_id: string
 }
 
@@ -169,13 +171,17 @@ export function EditBookDialog({ book, open, onOpenChange, onBookUpdated }: Edit
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-sm font-medium">Location</Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location || ''}
-                onChange={handleChange}
-                placeholder="Where is this book located?"
+              <LocationSelector
+                value={formData.location_id || ''}
+                onChange={(locationId, locationPath) => {
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    location_id: locationId,
+                    // Keep legacy location for backward compatibility
+                    location: locationPath
+                  }))
+                }}
+                placeholder="Choose where this book is located"
               />
             </div>
             

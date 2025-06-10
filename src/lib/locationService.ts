@@ -380,4 +380,23 @@ function calculateSimilarity(a: string, b: string): number {
 
   const maxLength = Math.max(a.length, b.length)
   return 1 - matrix[b.length][a.length] / maxLength
-} 
+}
+
+/**
+ * Get display text for a book's location (handles both legacy and hierarchical)
+ */
+export async function getBookLocationDisplay(book: { location?: string; location_id?: string }): Promise<string> {
+  // If the book has a hierarchical location_id, use that
+  if (book.location_id) {
+    try {
+      return await getLocationPath(book.location_id)
+    } catch (error) {
+      console.error('Error getting location path:', error)
+      // Fall back to legacy location if hierarchical fails
+      return book.location || 'Not shelved'
+    }
+  }
+  
+  // Fall back to legacy location field
+  return book.location || 'Not shelved'
+}

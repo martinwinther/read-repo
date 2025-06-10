@@ -12,7 +12,8 @@ export interface Book {
   purchase_location?: string;
   read: boolean;
   reader?: string;
-  location?: string;
+  location?: string; // legacy field
+  location_id?: string; // new hierarchical location
   user_id: string;
 }
 
@@ -54,7 +55,8 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
     author: book.author,
     published_date: book.published_date,
     read: book.read || false,
-    location: book.location,
+    location: book.location, // legacy field
+    location_id: book.location_id, // new hierarchical location
     user_id: user.id
   };
   
