@@ -207,6 +207,11 @@ export async function createPresetLocations(): Promise<void> {
  * Update a location
  */
 export async function updateLocation(id: string, updates: Partial<Location>): Promise<Location> {
+  // Handle temporary location IDs - they don't exist in the database
+  if (id.startsWith('temp-')) {
+    throw new Error('Cannot update temporary location')
+  }
+
   const supabase = createClientComponentClient()
   
   const { data: { user } } = await supabase.auth.getUser()
@@ -232,6 +237,11 @@ export async function updateLocation(id: string, updates: Partial<Location>): Pr
  * Soft delete a location
  */
 export async function deleteLocation(id: string): Promise<void> {
+  // Handle temporary location IDs - they don't exist in the database
+  if (id.startsWith('temp-')) {
+    throw new Error('Cannot delete temporary location')
+  }
+
   const supabase = createClientComponentClient()
   
   const { data: { user } } = await supabase.auth.getUser()
