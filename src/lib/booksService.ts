@@ -99,16 +99,32 @@ export async function addBook(book: Omit<Book, 'id' | 'user_id'>) {
 export async function updateBook(id: number, updates: Partial<Book>) {
   const supabase = createClientComponentClient();
   
+  // Handle temporary location IDs the same way as addBook
+  const processedUpdates = { ...updates };
+  
+  if (updates.location_id && updates.location_id.startsWith('temp-')) {
+    processedUpdates.location_id = undefined;
+    console.log('Temporary location detected in update, using legacy location field');
+  }
+  
+  console.log('Attempting to update book:', processedUpdates);
+  
   const { data, error } = await supabase
     .from('books')
-    .update(updates)
+    .update(processedUpdates)
     .eq('id', id)
     .select()
     .single();
     
   if (error) {
     console.error('Error updating book:', error);
-    throw error;
+    
+    // Provide more helpful error messages
+    if (error.code === '22P02') {
+      throw new Error('Invalid data format - please check location selection');
+    } else {
+      throw new Error(`Failed to update book: ${error.message}`);
+    }
   }
   
   return data as Book;
