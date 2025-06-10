@@ -29,7 +29,7 @@ const LocationCell = ({ book }: { book: Book }) => {
 				// Fallback to legacy location or default text
 				setLocationText(book.location || 'Not shelved')
 			})
-	}, [book.location, book.location_id])
+	}, [book.location, book.location_id]) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<div className="max-w-[120px] truncate" title={locationText}>

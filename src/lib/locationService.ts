@@ -167,7 +167,7 @@ export async function createPresetLocations(): Promise<void> {
       const name = preset.path[i]
       
       // Check if location already exists
-      const { data: existing }: { data: { id: string } | null } = await supabase
+      const result: { data: { id: string } | null; error: any } = await supabase
         .from('locations')
         .select('id')
         .eq('user_id', user.id)
@@ -176,8 +176,8 @@ export async function createPresetLocations(): Promise<void> {
         .is('deleted_at', null)
         .single()
 
-      if (existing) {
-        parentId = existing.id
+      if (result.data) {
+        parentId = result.data.id
         continue
       }
 

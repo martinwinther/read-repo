@@ -57,7 +57,7 @@ function useBookLocation(book: { location?: string; location_id?: string }) {
 				// Fallback to legacy location or default text
 				setLocationText(book.location || 'Not shelved')
 			})
-	}, [book.location, book.location_id])
+	}, [book.location, book.location_id]) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return locationText
 }

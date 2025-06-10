@@ -408,7 +408,7 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
               }}
             >
               <div className="text-left">
-                <div className="font-medium">📍 Use "{selectedRoom.name}"</div>
+                <div className="font-medium">📍 Use &quot;{selectedRoom.name}&quot;</div>
                 <div className="text-xs text-muted-foreground">Select just the room</div>
               </div>
             </Button>
@@ -425,7 +425,7 @@ function LocationPicker({ onSelect }: LocationPickerProps) {
               }}
             >
               <div className="text-left">
-                <div className="font-medium">📍 Use "{selectedLocation.name}"</div>
+                <div className="font-medium">📍 Use &quot;{selectedLocation.name}&quot;</div>
                 <div className="text-xs text-muted-foreground">Select this location without going deeper</div>
               </div>
             </Button>
